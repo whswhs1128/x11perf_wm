@@ -263,6 +263,9 @@ extern int InitTrapezoids ( XParms xp, Parms p, int reps );
 extern void DoTrapezoids ( XParms xp, Parms p, int reps );
 extern void EndTrapezoids ( XParms xp, Parms p );
 #ifdef XRENDER
+extern int InitFixedTraps ( XParms xp, Parms p, int reps );
+extern void DoFixedTraps ( XParms xp, Parms p, int reps );
+extern void EndFixedTraps ( XParms xp, Parms p );
 extern int InitFixedTrapezoids ( XParms xp, Parms p, int reps );
 extern void DoFixedTrapezoids ( XParms xp, Parms p, int reps );
 extern void EndFixedTrapezoids ( XParms xp, Parms p );

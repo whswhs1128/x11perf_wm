@@ -21,8 +21,10 @@ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
 
 ******************************************************************************/
+/* $XFree86: xc/programs/x11perf/do_text.c,v 1.9 2002/12/04 10:28:08 eich Exp $ */
 
 #include "x11perf.h"
+#include <stdio.h>
 
 static char **charBuf;
 static XFontStruct *font, *bfont;
@@ -34,10 +36,8 @@ static int charsPerLine, totalLines;
 #define SEGS 3
 
 
-int InitText(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+int 
+InitText(XParms xp, Parms p, int reps)
 {
     int		i, j;
     char	ch;
@@ -120,16 +120,14 @@ int InitText(xp, p, reps)
              | pci->ascent | pci->descent | pci->attributes) == 0);     \
 } /* GetRealChar */
 
-int InitText16(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+int 
+InitText16(XParms xp, Parms p, int reps)
 {
     register int	i, j;
     register char	*pbuf0, *pbuf1, *pbuf2;
     XGCValues   	gcv;
     int			rows, columns, totalChars, ch;
-    int			brows, bcolumns, btotalChars, bch;
+    int			brows, bcolumns = 0, btotalChars = 0, bch = 0;
 
     font = XLoadQueryFont(xp->d, p->font);
     if (font == NULL) {
@@ -221,10 +219,8 @@ int InitText16(xp, p, reps)
     return reps;
 }
 
-void DoText(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoText(XParms xp, Parms p, int reps)
 {
     int     i, line, startLine;
 
@@ -241,13 +237,12 @@ void DoText(xp, p, reps)
 	    startLine = (startLine + 1) % totalLines;
 	}
 	line = (line + 1) % totalLines;
+	CheckAbort ();
     }
 }
 
-void DoText16(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoText16(XParms xp, Parms p, int reps)
 {
     int     i, line, startLine;
 
@@ -264,13 +259,12 @@ void DoText16(xp, p, reps)
 	    startLine = (startLine + 1) % totalLines;
 	}
 	line = (line + 1) % totalLines;
+	CheckAbort ();
     }
 }
 
-void DoPolyText(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoPolyText(XParms xp, Parms p, int reps)
 {
     int     i, line, startLine;
 
@@ -287,13 +281,12 @@ void DoPolyText(xp, p, reps)
 	    startLine = (startLine + 1) % totalLines;
 	}
 	line = (line + 1) % totalLines;
+	CheckAbort ();
     }
 }
 
-void DoPolyText16(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoPolyText16(XParms xp, Parms p, int reps)
 {
     int     i, line, startLine;
 
@@ -310,13 +303,12 @@ void DoPolyText16(xp, p, reps)
 	    startLine = (startLine + 1) % totalLines;
 	}
 	line = (line + 1) % totalLines;
+	CheckAbort ();
     }
 }
 
-void DoImageText(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoImageText(XParms xp, Parms p, int reps)
 {
     int     i, line, startLine;
 
@@ -333,13 +325,12 @@ void DoImageText(xp, p, reps)
 	    line = startLine;
 	}
 	line = (line + 1) % totalLines;
+	CheckAbort ();
     }
 }
 
-void DoImageText16(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoImageText16(XParms xp, Parms p, int reps)
 {
     int     i, line, startLine;
 
@@ -356,19 +347,18 @@ void DoImageText16(xp, p, reps)
 	    line = startLine;
 	}
 	line = (line + 1) % totalLines;
+	CheckAbort ();
     }
 }
 
-void ClearTextWin(xp, p)
-    XParms  xp;
-    Parms   p;
+void 
+ClearTextWin(XParms xp, Parms p)
 {
     XClearWindow(xp->d, xp->w);
 }
 
-void EndText(xp, p)
-    XParms  xp;
-    Parms   p;
+void 
+EndText(XParms xp, Parms p)
 {
     int i;
 
@@ -383,9 +373,8 @@ void EndText(xp, p)
 	XFreeFont(xp->d, bfont);
 }
 
-void EndText16(xp, p)
-    XParms  xp;
-    Parms   p;
+void 
+EndText16(XParms xp, Parms p)
 {
     int i;
 
@@ -409,3 +398,117 @@ void EndText16(xp, p)
     }
 }
 
+#ifdef XFT
+#include <X11/extensions/Xrender.h>
+#include <X11/Xft/Xft.h>
+
+static XftFont	*aafont;
+static XftDraw	*aadraw;
+static XftColor	aacolor;
+
+int 
+InitAAText(XParms xp, Parms p, int reps)
+{
+    int			i, j;
+    char		ch;
+    XRenderColor	color;
+
+    aafont = XftFontOpenName (xp->d, DefaultScreen (xp->d), p->font);
+    
+    if (aafont == NULL) 
+    {
+	printf("Could not load font '%s', benchmark omitted\n", 
+	       p->font);
+	return 0;
+    }
+
+    aadraw = XftDrawCreate (xp->d, xp->w, 
+			    xp->vinfo.visual, 
+			    xp->cmap);
+
+    if (!aadraw) 
+    {
+	printf ("Cannot create XftDraw object\n");
+	XftFontClose (xp->d, aafont);
+	return 0;
+    }
+    color.red = 0;
+    color.green = 0;
+    color.blue = 0;
+    color.alpha = 0xffff;
+    if (!XftColorAllocValue (xp->d,
+			     xp->vinfo.visual, 
+			     xp->cmap,
+			     &color, &aacolor))
+    {
+	printf ("Cannot allocate black\n");
+	XftFontClose (xp->d, aafont);
+	XftDrawDestroy (aadraw);
+	aafont = 0;
+	aadraw = 0;
+	return 0;
+    }
+    
+    ypos = XPOS;
+    height = aafont->height;
+    
+    charsPerLine = p->objects;
+    charsPerLine = (charsPerLine + 3) & ~3;
+    p->objects = charsPerLine;
+
+    totalLines = '\177' - ' ' + 1;
+    if (totalLines > reps) totalLines = reps;
+
+    charBuf = (char **) malloc(totalLines*sizeof (char *));
+
+    for (i = 0; i != totalLines; i++) {
+	charBuf[i] = (char *) malloc (sizeof (char)*charsPerLine);
+	ch = i + ' ';
+	for (j = 0; j != charsPerLine; j++) {
+	    charBuf[i][j] = ch;
+	    if (ch == '\177') ch = ' '; else ch++;
+	}
+    }
+    return reps;
+}
+
+void 
+DoAAText(XParms xp, Parms p, int reps)
+{
+    int     i, line, startLine;
+
+    startLine = 0;
+    line = 0;
+    for (i = 0; i != reps; i++) {
+	XftDrawString8 (aadraw, &aacolor, aafont, 
+		       XPOS, ypos, (unsigned char *) charBuf[line], charsPerLine);
+	ypos += height;
+	if (ypos > HEIGHT - height) {
+	    /* Wraparound to top of window */
+	    ypos = XPOS;
+	    line = startLine;
+	    startLine = (startLine + 1) % totalLines;
+	}
+	line = (line + 1) % totalLines;
+	CheckAbort ();
+    }
+}
+
+void 
+EndAAText(XParms xp, Parms p)
+{
+    int i;
+
+    if(!aadraw)return;
+    for (i = 0; i != totalLines; i++)
+	free(charBuf[i]);
+    free(charBuf);
+    XftDrawDestroy (aadraw);
+    XftFontClose (xp->d, aafont);
+    XftColorFree (xp->d,
+		  xp->vinfo.visual, 
+		  xp->cmap,
+		  &aacolor);
+}
+
+#endif

@@ -21,164 +21,9 @@ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
 
 ******************************************************************************/
+/* $XFree86: xc/programs/x11perf/do_tests.c,v 1.10 2002/05/13 06:23:35 keithp Exp $ */
 
 #include "x11perf.h"
-
-extern void DoGetAtom();
-extern void DoQueryPointer();
-
-extern void DoNoOp();
-
-extern Bool InitGetProperty();
-extern void DoGetProperty();
-
-extern Bool InitRectangles();
-extern void DoRectangles();
-extern void DoOutlineRectangles();
-extern void EndRectangles();
-
-extern Bool InitGC();
-extern void DoChangeGC();
-extern void EndGC();
-
-extern Bool InitSegments();
-extern Bool InitHorizSegments();
-extern Bool InitVertSegments();
-extern Bool InitWideHorizSegments();
-extern Bool InitWideVertSegments();
-extern Bool InitDashedSegments();
-extern Bool InitDoubleDashedSegments();
-extern void DoSegments();
-extern void EndSegments();
-
-extern Bool InitLines();
-extern Bool InitWideLines();
-extern Bool InitDashedLines();
-extern Bool InitWideDashedLines();
-extern Bool InitDoubleDashedLines();
-extern Bool InitWideDoubleDashedLines();
-extern void DoLines();
-extern void EndLines();
-
-
-extern Bool InitCircles();
-extern Bool InitPartCircles();
-extern Bool InitWideCircles();
-extern Bool InitPartWideCircles();
-extern Bool InitDashedCircles();
-extern Bool InitWideDashedCircles();
-extern Bool InitDoubleDashedCircles();
-extern Bool InitWideDoubleDashedCircles();
-extern Bool InitChordPartCircles();
-extern Bool InitSlicePartCircles();
-
-extern Bool InitEllipses();
-extern Bool InitPartEllipses();
-extern Bool InitWideEllipses();
-extern Bool InitPartWideEllipses();
-extern Bool InitDashedEllipses();
-extern Bool InitWideDashedEllipses();
-extern Bool InitDoubleDashedEllipses();
-extern Bool InitWideDoubleDashedEllipses();
-extern Bool InitChordPartEllipses();
-extern Bool InitSlicePartEllipses();
-extern void DoArcs();
-extern void DoFilledArcs();
-extern void EndArcs();
-
-extern Bool InitDots();
-extern void DoDots();
-extern void EndDots();
-
-extern Bool InitCreate();
-extern void CreateChildren();
-extern void DestroyChildren();
-extern void EndCreate();
-
-extern Bool InitMap();
-extern void MapParents();
-extern void UnmapParents();
-
-extern Bool InitDestroy();
-extern void DestroyParents();
-extern void RenewParents();
-
-extern Bool InitMoveWindows();
-extern void DoMoveWindows();
-extern void EndMoveWindows();
-
-extern void DoResizeWindows();
-
-extern Bool InitCircWindows();
-extern void DoCircWindows();
-extern void EndCircWindows();
-
-extern Bool InitMoveTree();
-extern void DoMoveTree();
-extern void EndMoveTree();
-
-extern Bool InitText();
-extern Bool InitText16();
-extern void DoText();
-extern void DoText16();
-extern void DoImageText();
-extern void DoImageText16();
-extern void DoPolyText();
-extern void DoPolyText16();
-extern void ClearTextWin();
-extern void EndText();
-extern void EndText16();
-
-extern Bool InitCopyPlane();
-extern void DoCopyPlane();
-extern void EndCopyPlane();
-
-extern Bool InitPopups();
-extern void DoPopUps();
-extern void EndPopups();
-
-extern Bool InitScroll();
-extern void DoScroll();
-extern void MidScroll();
-extern void EndScroll();
-
-extern Bool InitCopyWin();
-extern Bool InitCopyPix();
-extern void DoCopyWinWin();
-extern void DoCopyPixWin();
-extern void DoCopyWinPix();
-extern void DoCopyPixPix();
-extern void MidCopyPix();
-extern void EndCopyWin();
-extern void EndCopyPix();
-
-extern Bool InitGetImage();
-extern void DoGetImage();
-extern void EndGetImage();
-
-extern Bool InitPutImage();
-extern void DoPutImage();
-
-#ifdef MITSHM
-extern Bool InitShmPutImage();
-extern void DoShmPutImage();
-extern void EndShmPutImage();
-#endif
-
-extern Bool InitTriangles();
-extern void DoTriangles();
-extern void EndTriangles();
-
-extern Bool InitTrapezoids();
-extern void DoTrapezoids();
-extern void EndTrapezoids();
-
-extern Bool InitComplexPoly();
-extern void DoComplexPoly();
-extern void EndComplexPoly();
-
-extern Bool InitGeneralPoly();
-extern void DoGeneralPoly();
 
 /*
  * some test must be done a certain multiple of times. That multiple is
@@ -945,6 +790,40 @@ Test test[] = {
 		InitTrapezoids, DoTrapezoids, NullProc, EndTrapezoids,
 		V1_4FEATURE, ROP, 0,
 		{2, 300, "escherknot", NULL, FillTiled}},
+#ifdef XRENDER
+  {"-aatrap1", "Fill 1x1 aa trapezoid", NULL,
+		InitFixedTrapezoids, DoFixedTrapezoids, NullProc, EndFixedTrapezoids,
+		V1_5FEATURE, NONROP, 0,
+		{POLY, 1 }},
+  {"-aatrap10", "Fill 10x10 aa trapezoid", NULL,
+		InitFixedTrapezoids, DoFixedTrapezoids, NullProc, EndFixedTrapezoids,
+		V1_5FEATURE, NONROP, 0,
+		{POLY, 10 }},
+  {"-aatrap100", "Fill 100x100 aa trapezoid", NULL,
+		InitFixedTrapezoids, DoFixedTrapezoids, NullProc, EndFixedTrapezoids,
+		V1_5FEATURE, NONROP, 0,
+		{POLY, 100 }},
+  {"-aatrap300", "Fill 300x300 aa trapezoid", NULL,
+		InitFixedTrapezoids, DoFixedTrapezoids, NullProc, EndFixedTrapezoids,
+		V1_5FEATURE, NONROP, 0,
+		{POLY, 300 }},
+  {"-addaatrap1", "Fill 1x1 aa pre-added trapezoid", NULL,
+		InitFixedTrapezoids, DoFixedTrapezoids, NullProc, EndFixedTrapezoids,
+		V1_5FEATURE, NONROP, 0,
+		{POLY, 1, "add" }},
+  {"-addaatrap10", "Fill 10x10 aa pre-added trapezoid", NULL,
+		InitFixedTrapezoids, DoFixedTrapezoids, NullProc, EndFixedTrapezoids,
+		V1_5FEATURE, NONROP, 0,
+		{POLY, 10, "add" }},
+  {"-addaatrap100", "Fill 100x100 aa pre-added trapezoid", NULL,
+		InitFixedTrapezoids, DoFixedTrapezoids, NullProc, EndFixedTrapezoids,
+		V1_5FEATURE, NONROP, 0,
+		{POLY, 100, "add" }},
+  {"-addaatrap300", "Fill 300x300 aa pre-added trapezoid", NULL,
+		InitFixedTrapezoids, DoFixedTrapezoids, NullProc, EndFixedTrapezoids,
+		V1_5FEATURE, NONROP, 0,
+		{POLY, 300, "add" }},
+#endif
   {"-complex10", "Fill 10-pixel/side complex polygon", NULL,
 		InitComplexPoly, DoComplexPoly, NullProc, EndComplexPoly,
 		V1_2ONLY, ROP, 0,
@@ -1060,6 +939,80 @@ Test test[] = {
 		{30, False, 
 		"-adobe-times-medium-r-normal--24-240-75-75-p-124-iso8859-1",
  		NULL}},
+#ifdef XFT
+  {"-aa10text", "Char in 80-char aa line (Charter 10)", NULL,
+	        InitAAText, DoAAText, ClearTextWin, EndAAText,
+		V1_5FEATURE, NONROP, 0,
+		{80, 10, "charter:antialias=true:rgba=0:pixelsize=10", NULL}},
+  {"-aa24text", "Char in 30-char aa line (Charter 24)", NULL,
+	        InitAAText, DoAAText, ClearTextWin, EndAAText,
+		V1_5FEATURE, NONROP, 0,
+		{30, 24, "charter:antialias=true:rgba=0:pixelsize=24", NULL}},
+  {"-aaftext", "Char in 80-char aa line (Courier 12)", NULL,
+	        InitAAText, DoAAText, ClearTextWin, EndAAText,
+		V1_5FEATURE, NONROP, 0,
+		{80, 12, "courier:antialias=true:rgba=0:pixelsize=12", NULL}},
+  {"-a10text", "Char in 80-char a line (Charter 10)", NULL,
+	        InitAAText, DoAAText, ClearTextWin, EndAAText,
+		V1_5FEATURE, NONROP, 0,
+		{80, 10, "charter:antialias=false:rgba=0:pixelsize=10", NULL}},
+  {"-a24text", "Char in 30-char a line (Charter 24)", NULL,
+	        InitAAText, DoAAText, ClearTextWin, EndAAText,
+		V1_5FEATURE, NONROP, 0,
+		{30, 24, "charter:antialias=false:rgba=0:pixelsize=24", NULL}},
+  {"-aftext", "Char in 80-char a line (Courier 12)", NULL,
+	        InitAAText, DoAAText, ClearTextWin, EndAAText,
+		V1_5FEATURE, NONROP, 0,
+		{80, 12, "courier:antialias=false:rgba=0:pixelsize=12", NULL}},
+  {"-rgb10text", "Char in 80-char rgb line (Charter 10)", NULL,
+	        InitAAText, DoAAText, ClearTextWin, EndAAText,
+		V1_5FEATURE, NONROP, 0,
+		{80, 10, "charter:antialias=true:rgba=rgb:pixelsize=10", NULL}},
+  {"-rgb24text", "Char in 30-char rgb line (Charter 24)", NULL,
+	        InitAAText, DoAAText, ClearTextWin, EndAAText,
+		V1_5FEATURE, NONROP, 0,
+		{30, 24, "charter:antialias=true:rgba=rgb:pixelsize=24", NULL}},
+  {"-rgbftext", "Char in 80-char rgb line (Courier 12)", NULL,
+	        InitAAText, DoAAText, ClearTextWin, EndAAText,
+		V1_5FEATURE, NONROP, 0,
+		{80, 12, "courier:antialias=true:rgba=rgb:pixelsize=12", NULL}},
+  {"-caa10text", "Char in 80-char aa core line (Charter 10)", NULL,
+	        InitAAText, DoAAText, ClearTextWin, EndAAText,
+		V1_5FEATURE, NONROP, 0,
+		{80, 10, "charter:antialias=true:render=false:rgba=0:pixelsize=10", NULL}},
+  {"-caa24text", "Char in 30-char aa core line (Charter 24)", NULL,
+	        InitAAText, DoAAText, ClearTextWin, EndAAText,
+		V1_5FEATURE, NONROP, 0,
+		{30, 24, "charter:antialias=true:render=false:rgba=0:pixelsize=24", NULL}},
+  {"-caaftext", "Char in 80-char aa core line (Courier 12)", NULL,
+	        InitAAText, DoAAText, ClearTextWin, EndAAText,
+		V1_5FEATURE, NONROP, 0,
+		{80, 12, "courier:antialias=true:render=false:rgba=0:pixelsize=12", NULL}},
+  {"-ca10text", "Char in 80-char a core line (Charter 10)", NULL,
+	        InitAAText, DoAAText, ClearTextWin, EndAAText,
+		V1_5FEATURE, NONROP, 0,
+		{80, 10, "charter:antialias=false:render=false:rgba=0:pixelsize=10", NULL}},
+  {"-ca24text", "Char in 30-char a core line (Charter 24)", NULL,
+	        InitAAText, DoAAText, ClearTextWin, EndAAText,
+		V1_5FEATURE, NONROP, 0,
+		{30, 24, "charter:antialias=false:render=false:rgba=0:pixelsize=24", NULL}},
+  {"-caftext", "Char in 80-char a core line (Courier 12)", NULL,
+	        InitAAText, DoAAText, ClearTextWin, EndAAText,
+		V1_5FEATURE, NONROP, 0,
+		{80, 12, "courier:antialias=false:render=false:rgba=0:pixelsize=12", NULL}},
+  {"-rgb10text", "Char in 80-char rgb core line (Charter 10)", NULL,
+	        InitAAText, DoAAText, ClearTextWin, EndAAText,
+		V1_5FEATURE, NONROP, 0,
+		{80, 10, "charter:antialias=true:render=false:rgba=rgb:pixelsize=10", NULL}},
+  {"-rgb24text", "Char in 30-char rgb core line (Charter 24)", NULL,
+	        InitAAText, DoAAText, ClearTextWin, EndAAText,
+		V1_5FEATURE, NONROP, 0,
+		{30, 24, "charter:antialias=true:render=false:rgba=rgb:pixelsize=24", NULL}},
+  {"-rgbftext", "Char in 80-char rgb core line (Courier 12)", NULL,
+	        InitAAText, DoAAText, ClearTextWin, EndAAText,
+		V1_5FEATURE, NONROP, 0,
+		{80, 12, "courier:antialias=true:render=false:rgba=rgb:pixelsize=12", NULL}},
+#endif
   {"-scroll10", "Scroll 10x10 pixels", NULL,
 		InitScroll, DoScroll, MidScroll, EndScroll,
 		V1_2FEATURE, ROP, 0,
@@ -1247,11 +1200,11 @@ Test test[] = {
 		V1_2FEATURE, WINDOW, 0,
 		{0, False}},
   {"-map",      "Map window via parent", NULL,
-		InitMap, MapParents, UnmapParents, EndCreate,
+		InitMap, MapParents, UnmapParentsCleanup, EndCreate,
 		V1_2FEATURE, WINDOW, 0,
 		{0, True}},
   {"-unmap",    "Unmap window via parent", NULL,
-		InitDestroy, UnmapParents, MapParents, EndCreate,
+		InitDestroy, UnmapParents, MapParentsCleanup, EndCreate,
 		V1_2FEATURE, WINDOW, 0,
 		{0, True}},
   {"-destroy",  "Destroy window via parent", NULL,

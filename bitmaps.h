@@ -21,11 +21,8 @@ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
 
 ******************************************************************************/
+/* $XFree86: xc/programs/x11perf/bitmaps.h,v 1.4 2001/01/17 23:45:11 dawes Exp $ */
 
 /* Set fill style (if any) to a bitmap or tile */
 
-extern void SetFillStyle(/* xp, p */);
-/*
-    XParms  xp;
-    Parms   p;
-*/
+extern void SetFillStyle(XParms xp, Parms p);

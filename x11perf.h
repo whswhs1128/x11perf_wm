@@ -21,9 +21,11 @@ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
 
 ******************************************************************************/
+/* $XFree86: xc/programs/x11perf/x11perf.h,v 3.6 2002/12/04 10:28:08 eich Exp $ */
 
 #ifndef VMS
 #include <X11/Xlib.h>
+#include <stdlib.h>
 #include <X11/Xutil.h>
 #else
 #include <decw$include/Xlib.h>
@@ -32,9 +34,7 @@ SOFTWARE.
 #if defined(XlibSpecificationRelease) && XlibSpecificationRelease >= 5
 #include <X11/Xfuncs.h>
 #endif
-#ifndef NULL
-#define NULL 0
-#endif
+#include <stddef.h>
 
 #define POLY	     1000       /* # (small) items in poly calls	*/
 #define MAXROWS	       40       /* Max rows of items in poly calls      */
@@ -49,11 +49,6 @@ SOFTWARE.
 #define BigTile	((char *)2)		/* Big tile/stipple */
 #define OddTile	((char *)1)		/* Odd sized tile/stipple */
 
-typedef Bool (*InitProc)    (/* XParms xp; Parms p */);
-typedef void (*Proc)	    (/* XParms xp; Parms p */);
-
-extern void NullProc	    (/* XParms xp; Parms p */);
-extern Bool NullInitProc    (/* XParms xp; Parms p */);
 
 typedef unsigned char Version;
 
@@ -94,7 +89,12 @@ typedef struct _XParms {
     Bool	    save_under;
     int		    backing_store;
     unsigned long   planemask;
+    Colormap	    cmap;
 } XParmRec, *XParms;
+
+typedef int (*InitProc)(XParms xp, Parms p, int reps);
+typedef void (*Proc)(XParms xp, Parms p, int reps);
+typedef void (*CleanupProc)(XParms xp, Parms p);
 
 typedef enum {
     WINDOW,     /* Windowing test, rop, planemask have no affect	*/
@@ -109,17 +109,192 @@ typedef struct _Test {
     char	*label14;   /* Labels that are different in Version 1.4     */
     InitProc    init;       /* Initialization procedure			    */
     Proc	proc;       /* Timed benchmark procedure		    */
-    Proc	passCleanup;/* Cleanup between repetitions of same test     */
-    Proc	cleanup;    /* Cleanup after test			    */
+    CleanupProc	passCleanup;/* Cleanup between repetitions of same test     */
+    CleanupProc	cleanup;    /* Cleanup after test			    */
     Version     versions;   /* Test in 1.2 only, 1.3 only, or both	    */
     TestType    testType;   /* Windowing, graphics rop, graphics non-rop    */
     int		clips;      /* Number of obscuring windows to force clipping*/
     ParmRec     parms;      /* Parameters passed to test procedures	    */
 } Test;
 
+extern void NullProc(XParms xp, Parms p);
+extern int NullInitProc(XParms xp, Parms p, int reps);
+
 extern Test test[];
 
+extern int abortTest;
+
+extern void AbortTest (void);
+
+#define CheckAbort()  if (abortTest) AbortTest ()
 #define ForEachTest(x) for (x = 0; test[x].option != NULL; x++)
+
+
+/* do_arcs.c */
+extern int InitCircles ( XParms xp, Parms p, int reps );
+extern int InitPartCircles ( XParms xp, Parms p, int reps );
+extern int InitChordPartCircles ( XParms xp, Parms p, int reps );
+extern int InitSlicePartCircles ( XParms xp, Parms p, int reps );
+extern int InitWideCircles ( XParms xp, Parms p, int reps );
+extern int InitPartWideCircles ( XParms xp, Parms p, int reps );
+extern int InitDashedCircles ( XParms xp, Parms p, int reps );
+extern int InitWideDashedCircles ( XParms xp, Parms p, int reps );
+extern int InitDoubleDashedCircles ( XParms xp, Parms p, int reps );
+extern int InitWideDoubleDashedCircles ( XParms xp, Parms p, int reps );
+extern int InitEllipses ( XParms xp, Parms p, int reps );
+extern int InitPartEllipses ( XParms xp, Parms p, int reps );
+extern int InitChordPartEllipses ( XParms xp, Parms p, int reps );
+extern int InitSlicePartEllipses ( XParms xp, Parms p, int reps );
+extern int InitWideEllipses ( XParms xp, Parms p, int reps );
+extern int InitPartWideEllipses ( XParms xp, Parms p, int reps );
+extern int InitDashedEllipses ( XParms xp, Parms p, int reps );
+extern int InitWideDashedEllipses ( XParms xp, Parms p, int reps );
+extern int InitDoubleDashedEllipses ( XParms xp, Parms p, int reps );
+extern int InitWideDoubleDashedEllipses ( XParms xp, Parms p, int reps );
+extern void DoArcs ( XParms xp, Parms p, int reps );
+extern void DoFilledArcs ( XParms xp, Parms p, int reps );
+extern void EndArcs ( XParms xp, Parms p );
+
+/* do_blt.c */
+extern int InitScroll ( XParms xp, Parms p, int reps );
+extern void DoScroll ( XParms xp, Parms p, int reps );
+extern void MidScroll ( XParms xp, Parms p );
+extern void EndScroll ( XParms xp, Parms p );
+extern int InitCopyWin ( XParms xp, Parms p, int reps );
+extern int InitCopyPix ( XParms xp, Parms p, int reps );
+extern int InitGetImage ( XParms xp, Parms p, int reps );
+extern int InitPutImage ( XParms xp, Parms p, int reps );
+extern void DoCopyWinWin ( XParms xp, Parms p, int reps );
+extern void DoCopyPixWin ( XParms xp, Parms p, int reps );
+extern void DoCopyWinPix ( XParms xp, Parms p, int reps );
+extern void DoCopyPixPix ( XParms xp, Parms p, int reps );
+extern void DoGetImage ( XParms xp, Parms p, int reps );
+extern void DoPutImage ( XParms xp, Parms p, int reps );
+#ifdef MITSHM
+extern int InitShmPutImage ( XParms xp, Parms p, int reps );
+extern void DoShmPutImage ( XParms xp, Parms p, int reps );
+extern void EndShmPutImage ( XParms xp, Parms p );
+#endif
+extern void MidCopyPix ( XParms xp, Parms p );
+extern void EndCopyWin ( XParms xp, Parms p );
+extern void EndCopyPix ( XParms xp, Parms p );
+extern void EndGetImage ( XParms xp, Parms p );
+extern int InitCopyPlane ( XParms xp, Parms p, int reps );
+extern void DoCopyPlane ( XParms xp, Parms p, int reps );
+
+/* do_complex.c */
+extern int InitComplexPoly ( XParms xp, Parms p, int reps );
+extern void DoComplexPoly ( XParms xp, Parms p, int reps );
+extern void EndComplexPoly ( XParms xp, Parms p );
+extern int InitGeneralPoly ( XParms xp, Parms p, int reps );
+extern void DoGeneralPoly ( XParms xp, Parms p, int reps );
+
+/* do_dots.c */
+extern int InitDots ( XParms xp, Parms p, int reps );
+extern void DoDots ( XParms xp, Parms p, int reps );
+extern void EndDots ( XParms xp, Parms p );
+
+/* do_lines.c */
+extern int InitLines ( XParms xp, Parms p, int reps );
+extern int InitWideLines ( XParms xp, Parms p, int reps );
+extern int InitDashedLines ( XParms xp, Parms p, int reps );
+extern int InitWideDashedLines ( XParms xp, Parms p, int reps );
+extern int InitDoubleDashedLines ( XParms xp, Parms p, int reps );
+extern int InitWideDoubleDashedLines ( XParms xp, Parms p, int reps );
+extern void DoLines ( XParms xp, Parms p, int reps );
+extern void EndLines ( XParms xp, Parms p );
+
+/* do_movewin.c */
+extern int InitMoveWindows ( XParms xp, Parms p, int reps );
+extern void DoMoveWindows ( XParms xp, Parms p, int reps );
+extern void EndMoveWindows ( XParms xp, Parms p );
+extern void DoResizeWindows ( XParms xp, Parms p, int reps );
+extern int InitCircWindows ( XParms xp, Parms p, int reps );
+extern void DoCircWindows ( XParms xp, Parms p, int reps );
+extern void EndCircWindows ( XParms xp, Parms p );
+extern int InitMoveTree ( XParms xp, Parms p, int reps );
+extern void DoMoveTree ( XParms xp, Parms p, int reps );
+extern void EndMoveTree ( XParms xp, Parms p );
+
+/* do_rects.c */
+extern int InitRectangles ( XParms xp, Parms p, int reps );
+extern void DoRectangles ( XParms xp, Parms p, int reps );
+extern void DoOutlineRectangles ( XParms xp, Parms p, int reps );
+extern void EndRectangles ( XParms xp, Parms p );
+
+/* do_segs.c */
+extern int InitSegments ( XParms xp, Parms p, int reps );
+extern int InitDashedSegments ( XParms xp, Parms p, int reps );
+extern int InitDoubleDashedSegments ( XParms xp, Parms p, int reps );
+extern int InitHorizSegments ( XParms xp, Parms p, int reps );
+extern int InitWideHorizSegments ( XParms xp, Parms p, int reps );
+extern int InitVertSegments ( XParms xp, Parms p, int reps );
+extern int InitWideVertSegments ( XParms xp, Parms p, int reps );
+extern void DoSegments ( XParms xp, Parms p, int reps );
+extern void EndSegments ( XParms xp, Parms p );
+
+/* do_simple.c */
+extern void DoNoOp ( XParms xp, Parms p, int reps );
+extern void DoGetAtom ( XParms xp, Parms p, int reps );
+extern void DoQueryPointer ( XParms xp, Parms p, int reps );
+extern int InitGetProperty ( XParms xp, Parms p, int reps );
+extern void DoGetProperty ( XParms xp, Parms p, int reps );
+
+/* do_text.c */
+extern int InitText ( XParms xp, Parms p, int reps );
+extern int InitText16 ( XParms xp, Parms p, int reps );
+extern void DoText ( XParms xp, Parms p, int reps );
+extern void DoText16 ( XParms xp, Parms p, int reps );
+extern void DoPolyText ( XParms xp, Parms p, int reps );
+extern void DoPolyText16 ( XParms xp, Parms p, int reps );
+extern void DoImageText ( XParms xp, Parms p, int reps );
+extern void DoImageText16 ( XParms xp, Parms p, int reps );
+extern void ClearTextWin ( XParms xp, Parms p );
+extern void EndText ( XParms xp, Parms p );
+extern void EndText16 ( XParms xp, Parms p );
+#ifdef XFT
+extern int InitAAText (XParms xp, Parms p, int reps );
+extern void DoAAText (XParms xp, Parms p, int reps );
+extern void EndAAText ( XParms xp, Parms p );
+#endif
+
+/* do_traps.c */
+extern int InitTrapezoids ( XParms xp, Parms p, int reps );
+extern void DoTrapezoids ( XParms xp, Parms p, int reps );
+extern void EndTrapezoids ( XParms xp, Parms p );
+#ifdef XRENDER
+extern int InitFixedTrapezoids ( XParms xp, Parms p, int reps );
+extern void DoFixedTrapezoids ( XParms xp, Parms p, int reps );
+extern void EndFixedTrapezoids ( XParms xp, Parms p );
+#endif
+
+/* do_tris.c */
+extern int InitTriangles ( XParms xp, Parms p, int reps );
+extern void DoTriangles ( XParms xp, Parms p, int reps );
+extern void EndTriangles ( XParms xp, Parms p );
+
+/* do_valgc.c */
+extern int InitGC ( XParms xp, Parms p, int reps );
+extern void DoChangeGC ( XParms xp, Parms p, int reps );
+extern void EndGC ( XParms xp, Parms p );
+
+/* do_windows.c */
+extern int CreateParents ( XParms xp, Parms p, int reps );
+extern void MapParents ( XParms xp, Parms p, int reps );
+extern void MapParentsCleanup ( XParms xp, Parms p );
+extern int InitCreate ( XParms xp, Parms p, int reps );
+extern void CreateChildren ( XParms xp, Parms p, int reps );
+extern void DestroyChildren ( XParms xp, Parms p );
+extern void EndCreate ( XParms xp, Parms p );
+extern int InitMap ( XParms xp, Parms p, int reps );
+extern void UnmapParents ( XParms xp, Parms p, int reps );
+extern void UnmapParentsCleanup ( XParms xp, Parms p);
+extern int InitDestroy ( XParms xp, Parms p, int reps );
+extern void DestroyParents ( XParms xp, Parms p, int reps );
+extern void RenewParents ( XParms xp, Parms p );
+extern int InitPopups ( XParms xp, Parms p, int reps );
+extern void DoPopUps ( XParms xp, Parms p, int reps );
+extern void EndPopups ( XParms xp, Parms p );
 
 
 /*****************************************************************************

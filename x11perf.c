@@ -1,4 +1,4 @@
-/* $Xorg: x11perf.c,v 1.6 2001/01/23 17:21:42 pookie Exp $ */
+/* $Xorg: x11perf.c,v 1.4 2000/08/17 19:54:10 cpqbld Exp $ */
 /****************************************************************************
 Copyright 1988, 1989 by Digital Equipment Corporation, Maynard, Massachusetts.
 
@@ -21,6 +21,7 @@ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
 
 ****************************************************************************/
+/* $XFree86: xc/programs/x11perf/x11perf.c,v 3.8 2002/12/04 10:28:08 eich Exp $ */
 
 #include <stdio.h>
 #include <ctype.h>
@@ -35,37 +36,35 @@ SOFTWARE.
 #include "x11perf.h"
 #include <X11/Xmu/SysUtil.h>
 
-#ifdef X_NOT_STDC_ENV
-#define Time_t long
-extern Time_t time ();
-#else
 #include <time.h>
 #define Time_t time_t
-#endif
+#include <stdlib.h>
 
 /* Only for working on ``fake'' servers, for hardware that doesn't exist */
 static Bool     drawToFakeServer = False;
 static Pixmap   tileToQuery     = None;
+static char *displayName;
+int	abortTest;
 
 typedef struct _RopNames { char	*name; int  rop; } RopNameRec, *RopNamePtr;
 
 RopNameRec ropNames[] = {
-	"clear",    	GXclear,	/* 0 */
-	"and",		GXand,		/* src AND dst */
-	"andReverse",	GXandReverse,	/* src AND NOT dst */
-	"copy",		GXcopy,		/* src */
-	"andInverted",	GXandInverted,	/* NOT src AND dst */
-	"noop",		GXnoop,		/* dst */
-	"xor",		GXxor,		/* src XOR dst */
-	"or",		GXor,		/* src OR dst */
-	"nor",		GXnor,		/* NOT src AND NOT dst */
-	"equiv",	GXequiv,	/* NOT src XOR dst */
-	"invert",	GXinvert,	/* NOT dst */
-	"orReverse",	GXorReverse,	/* src OR NOT dst */
-	"copyInverted",	GXcopyInverted,	/* NOT src */
-	"orInverted",	GXorInverted,	/* NOT src OR dst */
-	"nand",		GXnand,		/* NOT src OR NOT dst */
-	"set",		GXset,		/* 1 */
+	{ "clear",    	  GXclear },		/* 0 */
+	{ "and",	  GXand },		/* src AND dst */
+	{ "andReverse",	  GXandReverse }, 	/* src AND NOT dst */
+	{ "copy",	  GXcopy },		/* src */
+	{ "andInverted",  GXandInverted },	/* NOT src AND dst */
+	{ "noop",	  GXnoop },		/* dst */
+	{ "xor",	  GXxor },		/* src XOR dst */
+	{ "or",		  GXor },		/* src OR dst */
+	{ "nor",	  GXnor },		/* NOT src AND NOT dst */
+	{ "equiv",	  GXequiv },		/* NOT src XOR dst */
+	{ "invert",	  GXinvert },		/* NOT dst */
+	{ "orReverse",	  GXorReverse },	/* src OR NOT dst */
+	{ "copyInverted", GXcopyInverted },	/* NOT src */
+	{ "orInverted",	  GXorInverted },	/* NOT src OR dst */
+	{ "nand",	  GXnand },		/* NOT src OR NOT dst */
+	{ "set",	  GXset }		/* 1 */
 };
 
 char *(visualClassNames)[] = {
@@ -121,12 +120,16 @@ static Window clipWindows[MAXCLIP];
 static Colormap cmap;
 static int depth = -1;  /* -1 means use default depth */
 static int vclass = -1; /* -1 means use CopyFromParent */
-static Visual *visual = CopyFromParent;
 
 /* ScreenSaver state */
 static XParmRec    xparms;
 static int ssTimeout, ssInterval, ssPreferBlanking, ssAllowExposures;
 
+/* Static functions */
+static int GetWords(int argi, int argc, char **argv, char **wordsp, int *nump);
+static int GetNumbers(int argi, int argc, char **argv, unsigned long *intsp, 
+		      int *nump);
+static int GetRops(int argi, int argc, char **argv, int *ropsp, int *nump);
 
 /************************************************
 *	    time related stuff			*
@@ -179,7 +182,8 @@ int gettimeofday(tp)
 
 static struct  timeval start;
 
-void PrintTime()
+static void 
+PrintTime(void)
 {
     Time_t t;
 
@@ -187,13 +191,14 @@ void PrintTime()
     printf("%s\n", ctime(&t));
 }
 
-void InitTimes ()
+static void 
+InitTimes(void)
 {
     X_GETTIMEOFDAY(&start);
 }
 
-double ElapsedTime(correction)
-    double correction;
+static double 
+ElapsedTime(double correction)
 {
     struct timeval stop;
 
@@ -206,8 +211,8 @@ double ElapsedTime(correction)
             (1000000.0 * (double)(stop.tv_sec - start.tv_sec)) - correction;
 }
 
-double RoundTo3Digits(d)
-    double d;
+static double 
+RoundTo3Digits(double d)
 {
     /* It's kind of silly to print out things like ``193658.4/sec'' so just
        junk all but 3 most significant digits. */
@@ -240,10 +245,8 @@ double RoundTo3Digits(d)
 }
 
 
-void ReportTimes(usecs, n, str, average)
-    double  usecs;
-    int     n;
-    char    *str;
+static void 
+ReportTimes(double usecs, int n, char *str, int average)
 {
     double msecsperobj, objspersec;
 
@@ -277,15 +280,15 @@ void ReportTimes(usecs, n, str, average)
 ************************************************/
 
 static char *program_name;
-void usage();
+static void usage(void);
 
 /*
  * Get_Display_Name (argc, argv) Look for -display, -d, or host:dpy (obselete)
  * If found, remove it from command line.  Don't go past a lone -.
  */
-char *Get_Display_Name(pargc, argv)
-    int     *pargc;  /* MODIFIED */
-    char    **argv; /* MODIFIED */
+static char *
+Get_Display_Name(int *pargc, /* MODIFIED */
+		 char **argv) /* MODIFIED */
 {
     int     argc = *pargc;
     char    **pargv = argv+1;
@@ -319,9 +322,9 @@ char *Get_Display_Name(pargc, argv)
  * If found remove it from command line.  Don't go past a lone -.
  */
 
-Version GetVersion(pargc, argv)
-    int     *pargc;  /* MODIFIED */
-    char    **argv; /* MODIFIED */
+static Version 
+GetVersion(int *pargc, /* MODIFIED */
+	   char **argv)  /* MODIFIED */
 {
     int     argc = *pargc;
     char    **pargv = argv+1;
@@ -375,8 +378,8 @@ Version GetVersion(pargc, argv)
 /*
  * Open_Display: Routine to open a display with correct error handling.
  */
-Display *Open_Display(display_name)
-    char *display_name;
+static Display *
+Open_Display(char *display_name)
 {
     Display *d;
 
@@ -385,7 +388,6 @@ Display *Open_Display(display_name)
 	fprintf (stderr, "%s:  unable to open display '%s'\n",
 		 program_name, XDisplayName (display_name));
 	exit(1);
-	/* doesn't return */
     }
 
     return(d);
@@ -393,28 +395,33 @@ Display *Open_Display(display_name)
 
 
 #ifdef SIGNALRETURNSINT
-int
+static int
 #else
-void
+static void
 #endif
-Cleanup(sig)
-    int sig;
+Cleanup(int sig)
+{
+    abortTest = sig;
+}
+
+void
+AbortTest(void)
 {
     fflush(stdout);
-    /* This will screw up if Xlib is in the middle of something */
+    
     XSetScreenSaver(xparms.d, ssTimeout, ssInterval, ssPreferBlanking,
 	ssAllowExposures);
     XFlush(xparms.d);
-    exit(sig);
+    exit (abortTest);
 }
-
 
 /************************************************
 *		Performance stuff		*
 ************************************************/
 
 
-void usage()
+static void 
+usage(void)
 {
     char    **cpp;
     int     i = 0;
@@ -470,23 +477,19 @@ NULL};
     exit (1);
 }
 
-void NullProc(xp, p)
-    XParms  xp;
-    Parms   p;
+void 
+NullProc(XParms xp, Parms p)
 {
 }
 
-Bool NullInitProc(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int reps;
+int 
+NullInitProc(XParms xp, Parms p, int reps)
 {
     return reps;
 }
 
-
-void HardwareSync(xp)
-    XParms  xp;
+static void 
+HardwareSync(XParms xp)
 {
     /*
      * Some graphics hardware allows the server to claim it is done,
@@ -501,15 +504,14 @@ void HardwareSync(xp)
     if (image) XDestroyImage(image);
 }
 
-void DoHardwareSync(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+static void 
+DoHardwareSync(XParms xp, Parms p, int reps)    
 {
     int i;
     
     for (i = 0; i != reps; i++) {
 	HardwareSync(xp);
+	CheckAbort ();
     }
 }
 
@@ -521,9 +523,8 @@ static Test syncTest = {
 };
 
 
-static Window CreatePerfWindow(xp, x, y, width, height)
-    XParms  xp;
-    int     width, height, x, y;
+static Window 
+CreatePerfWindow(XParms xp, int x, int y, int width, int height)
 {
     XSetWindowAttributes xswa;
     Window w;
@@ -554,9 +555,8 @@ static Window CreatePerfWindow(xp, x, y, width, height)
 }
 
 
-void CreateClipWindows(xp, clips)
-    XParms  xp;
-    int     clips;
+static void 
+CreateClipWindows(XParms xp, int clips)
 {
     int j;
     XWindowAttributes    xwa;
@@ -570,9 +570,8 @@ void CreateClipWindows(xp, clips)
 } /* CreateClipWindows */
 
 
-void DestroyClipWindows(xp, clips)
-    XParms  xp;
-    int     clips;
+static void 
+DestroyClipWindows(XParms xp, int clips)
 {
     int j;
 
@@ -583,10 +582,8 @@ void DestroyClipWindows(xp, clips)
 } /* DestroyClipWindows */
 
 
-double DoTest(xp, test, reps)
-    XParms  xp;
-    Test    *test;
-    int     reps;
+static double 
+DoTest(XParms xp, Test *test, int reps)
 {
     double  time;
     unsigned int ret_width, ret_height;
@@ -600,6 +597,7 @@ double DoTest(xp, test, reps)
     HardwareSync(xp);
 
     time = ElapsedTime(syncTime);
+    CheckAbort ();
     if (drawToFakeServer)
         XQueryBestSize(xp->d, TileShape, tileToQuery,
 		       32, 32, &ret_width, &ret_height);
@@ -608,11 +606,8 @@ double DoTest(xp, test, reps)
 }
 
 
-int CalibrateTest(xp, test, seconds, usecperobj)
-    XParms  xp;
-    Test    *test;
-    int     seconds;
-    double  *usecperobj;
+static int 
+CalibrateTest(XParms xp, Test *test, int seconds, double *usecperobj)
 {
 #define goal    2500000.0   /* Try to get up to 2.5 seconds		    */
 #define enough  2000000.0   /* But settle for 2.0 seconds		    */
@@ -637,6 +632,7 @@ int CalibrateTest(xp, test, seconds, usecperobj)
 	XDestroySubwindows(xp->d, xp->w);
 	XClearWindow(xp->d, xp->w);
 	didreps = (*test->init) (xp, &test->parms, reps);
+	CheckAbort ();
 	if (didreps == 0) {
 	    return 0;
 	}
@@ -652,6 +648,7 @@ int CalibrateTest(xp, test, seconds, usecperobj)
 	(*test->passCleanup) (xp, &test->parms);
 	(*test->cleanup) (xp, &test->parms);
 	DestroyClipWindows(xp, test->clips);
+	CheckAbort ();
 
 	if (didreps != reps) {
 	    /* The test can't do the number of reps as we asked for.  
@@ -686,10 +683,8 @@ int CalibrateTest(xp, test, seconds, usecperobj)
     return reps;
 } /* CalibrateTest */
 
-void CreatePerfGCs(xp, func, pm)
-    XParms  xp;
-    int     func;
-    unsigned long   pm;
+static void 
+CreatePerfGCs(XParms xp, int func, unsigned long pm)
 {
     XGCValues gcvfg, gcvbg, gcvddbg,gcvddfg;
     unsigned long	fg, bg, ddbg;
@@ -742,8 +737,8 @@ void CreatePerfGCs(xp, func, pm)
 }
 
 
-void DestroyPerfGCs(xp)
-    XParms(xp);
+static void 
+DestroyPerfGCs(XParms xp)
 {
     XFreeGC(xp->d, xp->fggc);
     XFreeGC(xp->d, xp->bggc);
@@ -751,10 +746,8 @@ void DestroyPerfGCs(xp)
     XFreeGC(xp->d, xp->ddbggc);
 }
 
-unsigned long AllocateColor(display, name, pixel)
-    Display     *display;
-    char	*name;
-    unsigned long pixel;
+static unsigned long 
+AllocateColor(Display *display, char *name, unsigned long pixel)
 {
     XColor      color;
 
@@ -778,10 +771,8 @@ unsigned long AllocateColor(display, name, pixel)
 } /* AllocateColor */
 
 
-void DisplayStatus(d, message, test, try)
-    Display *d;
-    char    *message;
-    char    *test;
+static void 
+DisplayStatus(Display *d, char *message, char *test, int try)
 {
     char    s[500];
 
@@ -793,12 +784,8 @@ void DisplayStatus(d, message, test, try)
 }
 
 
-void ProcessTest(xp, test, func, pm, label)
-    XParms  xp;
-    Test    *test;
-    int     func;
-    unsigned long   pm;
-    char    *label;
+static void 
+ProcessTest(XParms xp, Test *test, int func, unsigned long pm, char *label)
 {
     double  time, totalTime;
     int     reps;
@@ -813,6 +800,8 @@ void ProcessTest(xp, test, func, pm, label)
 	XDestroySubwindows(xp->d, xp->w);
 	XClearWindow(xp->d, xp->w);
 	reps = (*test->init) (xp, &test->parms, reps);
+	if (abortTest)
+	    AbortTest ();
 	/*
 	 * if using fixedReps then will not have done CalibrateTest so must
 	 * check result of init for 0 here
@@ -828,6 +817,8 @@ void ProcessTest(xp, test, func, pm, label)
 	for (j = 0; j != repeat; j++) {
 	    DisplayStatus(xp->d, "Testing", label, j+1);
 	    time = DoTest(xp, test, reps);
+	    if (abortTest)
+		AbortTest ();
 	    totalTime += time;
 	    ReportTimes (time, reps * test->parms.objects,
 		    label, False);
@@ -847,41 +838,23 @@ void ProcessTest(xp, test, func, pm, label)
     DestroyPerfGCs(xp);
 } /* ProcessTest */
 
-#ifndef X_NOT_STDC_ENV
 #define Strstr strstr
-#else
-char *Strstr(s1, s2)
-    char *s1, *s2;
-{
-    int n1, n2;
-
-    n1 = strlen(s1);
-    n2 = strlen(s2);
-    for ( ; n1 >= n2; s1++, n1--) {
-	if (!strncmp(s1, s2, n2))
-	    return s1;
-    }	
-    return NULL;
-}
-#endif
 
 #define LABELP(i) (test[i].label14 && (xparms.version >= VERSION1_4) \
 		        ? test[i].label14 : test[i].label)
 
-main(argc, argv)
-    int argc;
-    char **argv;
-
+int
+main(int argc, char *argv[])
 {
     int		i, j, n, skip;
     int		numTests;       /* Even though the linker knows, we don't. */
     char	hostname[100];
-    char	*displayName;
     Bool	foundOne = False;
     Bool	synchronous = False;
     XGCValues	tgcv;
     int		screen;
     int		rop, pm;
+    int		window_y, window_x;
     XVisualInfo *vinfolist, vinfotempl;
     unsigned long vmask;
 
@@ -1100,7 +1073,7 @@ main(argc, argv)
 					    LABELP(i));
 				    }
 				} else {
-				    printf ("(%s 0x%x) %s\n",
+				    printf ("(%s 0x%lx) %s\n",
 					    ropNames[rops[rop]].name,
 					    planemasks[pm],
 					    LABELP(i));
@@ -1115,7 +1088,7 @@ main(argc, argv)
 			    if (planemasks[pm] == ~0) {
 				printf ("%s\n", LABELP(i));
 			    } else {
-				printf ("(0x%x) %s\n",
+				printf ("(0x%lx) %s\n",
 					planemasks[pm],
 					LABELP(i));
 			    }
@@ -1124,7 +1097,7 @@ main(argc, argv)
 		    
 		    case WINDOW:
 			for (child = 0; child != numSubWindows; child++) {
-			    printf ("%s (%d kids)\n",
+			    printf ("%s (%ld kids)\n",
 				LABELP(i), subWindows[child]);
 			}
 			break;
@@ -1192,7 +1165,8 @@ main(argc, argv)
 	    XInstallColormap(xparms.d, cmap);
 	}
     }
-
+    xparms.cmap = cmap;
+    
     printf("x11perf - X11 performance program, version %s\n",
 	   xparms.version & VERSION1_5 ? "1.5" :
 	   xparms.version & VERSION1_4 ? "1.4" :
@@ -1238,14 +1212,20 @@ main(argc, argv)
 	AllocateColor(xparms.d, background, WhitePixel(xparms.d, screen));
     xparms.ddbackground =
 	AllocateColor(xparms.d, ddbackground, WhitePixel(xparms.d, screen));
-    xparms.w = CreatePerfWindow(&xparms, 2, 2, WIDTH, HEIGHT);
+    window_x = 2;
+    if (DisplayWidth(xparms.d, screen) < WIDTH + window_x + 1)
+	window_x = -1;
+    window_y = 2;
+    if (DisplayHeight(xparms.d, screen) < HEIGHT + window_y + 1)
+	window_y = -1;
+    xparms.w = CreatePerfWindow(&xparms, window_x, window_y, WIDTH, HEIGHT);
     HSx = WIDTH-1;
-    if (3 + WIDTH > DisplayWidth(xparms.d, screen))
-	HSx = DisplayWidth(xparms.d, screen) - 4;
+    if (window_x + 1 + WIDTH > DisplayWidth(xparms.d, screen))
+	HSx = DisplayWidth(xparms.d, screen) - (1 + window_x + 1);
     HSy = HEIGHT-1;
-    if (3 + HEIGHT > DisplayHeight(xparms.d, screen))
-	HSy = DisplayHeight(xparms.d, screen) - 4;
-    status = CreatePerfWindow(&xparms, 2, HEIGHT+5, WIDTH, 20);
+    if (window_y + 1 + HEIGHT > DisplayHeight(xparms.d, screen))
+	HSy = DisplayHeight(xparms.d, screen) - (1 + window_y + 1);
+    status = CreatePerfWindow(&xparms, window_x, HEIGHT+5, WIDTH, 20);
     tgcv.foreground = 
 	AllocateColor(xparms.d, "black", BlackPixel(xparms.d, screen));
     tgcv.background = 
@@ -1261,7 +1241,7 @@ main(argc, argv)
        software cursor machines it will slow graphics performance.  On
        all current MIT-derived servers it will slow window 
        creation/configuration performance. */
-    XWarpPointer(xparms.d, None, status, 0, 0, 0, 0, WIDTH+10, 20+10);
+    XWarpPointer(xparms.d, None, status, 0, 0, 0, 0, WIDTH+32, 20+32);
 
     /* Figure out how long to call HardwareSync, so we can adjust for that
        in our total elapsed time */
@@ -1293,7 +1273,7 @@ main(argc, argv)
 					LABELP(i));
 				}
 			    } else {
-				sprintf (label, "(%s 0x%x) %s",
+				sprintf (label, "(%s 0x%lx) %s",
 					ropNames[rops[rop]].name,
 					planemasks[pm],
 					LABELP(i));
@@ -1310,7 +1290,7 @@ main(argc, argv)
 			if (planemasks[pm] == ~0) {
 			    sprintf (label, "%s", LABELP(i));
 			} else {
-			    sprintf (label, "(0x%x) %s",
+			    sprintf (label, "(0x%lx) %s",
 				    planemasks[pm],
 				    LABELP(i));
 			}
@@ -1336,22 +1316,18 @@ main(argc, argv)
     XDestroyWindow(xparms.d, xparms.w);
     XFree(vinfolist);
     if (drawToFakeServer)
-    	XFreePixmap(xparms.d, tileToQuery);
+      XFreePixmap(xparms.d, tileToQuery);
     /* Restore ScreenSaver to original state. */
     XSetScreenSaver(xparms.d, ssTimeout, ssInterval, ssPreferBlanking,
 	ssAllowExposures);
     XCloseDisplay(xparms.d);
     free(saveargv);
     free(doit);
+    exit(0);
 }
 
-int
-GetWords (argi, argc, argv, wordsp, nump)
-    int     argi;
-    int     argc;
-    char    **argv;
-    char    **wordsp;
-    int     *nump;
+static int
+GetWords (int argi, int argc, char **argv, char **wordsp, int *nump)
 {
     int	    count;
 
@@ -1368,10 +1344,9 @@ GetWords (argi, argc, argv, wordsp, nump)
 }
 
 static long
-atox (s)
-    char    *s;
+atox (char *s)
 {
-    long   v, c;
+    long   v, c = 0;
 
     v = 0;
     while (*s) {
@@ -1387,12 +1362,8 @@ atox (s)
     return v;
 }
 
-int GetNumbers (argi, argc, argv, intsp, nump)
-    int     argi;
-    int     argc;
-    char    **argv;
-    unsigned long    *intsp;
-    int     *nump;
+static int 
+GetNumbers (int argi, int argc, char **argv, unsigned long *intsp, int *nump)
 {
     char    *words[256];
     int	    count;
@@ -1414,12 +1385,8 @@ int GetNumbers (argi, argc, argv, intsp, nump)
     return count;
 }
 
-GetRops (argi, argc, argv, ropsp, nump)
-    int     argi;
-    int     argc;
-    char    **argv;
-    int     *ropsp;
-    int     *nump;
+static int
+GetRops (int argi, int argc, char **argv, int *ropsp, int *nump)
 {
     char    *words[256];
     int	    count;

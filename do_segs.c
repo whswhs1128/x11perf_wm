@@ -21,23 +21,22 @@ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
 
 ******************************************************************************/
+/* $XFree86: xc/programs/x11perf/do_segs.c,v 1.5 2001/01/17 23:45:11 dawes Exp $ */
 
 #include "x11perf.h"
 
 static XSegment *segments;
 static GC       pgc;
 
-static void GenerateSegments(xp, p, ddashed)
-    XParms  xp;
-    Parms   p;
-    Bool     ddashed;
+static void 
+GenerateSegments(XParms xp, Parms p, Bool ddashed)
 {
     int     size;
     int     half;
     int     i;
     int     rows;	    /* Number of rows filled in current column      */
     int     x, y;	    /* base of square to draw in		    */
-    int     x1, y1, x2, y2; /* offsets into square			    */
+    int     x1=0, y1=0, x2=0, y2=0; /* offsets into square		    */
     int     phase;	    /* how far into 0..8*size we are		    */
     int     phaseinc;       /* how much to increment phase at each segment  */
     int     size8;	    /* 8 * size					    */
@@ -168,19 +167,15 @@ static void GenerateSegments(xp, p, ddashed)
     }
 }
    
-int InitSegments(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+int 
+InitSegments(XParms xp, Parms p, int reps)
 {
     GenerateSegments(xp, p, False);
     return reps;
 }
 
-int InitDashedSegments(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+int 
+InitDashedSegments(XParms xp, Parms p, int reps)
 {
     char dashes[2];
 
@@ -197,10 +192,8 @@ int InitDashedSegments(xp, p, reps)
     return reps;
 }
 
-int InitDoubleDashedSegments(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+int 
+InitDoubleDashedSegments(XParms xp, Parms p, int reps)
 {
     char dashes[2];
 
@@ -217,10 +210,8 @@ int InitDoubleDashedSegments(xp, p, reps)
     return reps;
 }
 
-int InitHorizSegments(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+int 
+InitHorizSegments(XParms xp, Parms p, int reps)
 {
     int     size;
     int     half;
@@ -275,10 +266,8 @@ int InitHorizSegments(xp, p, reps)
     return reps;
 }
 
-int InitWideHorizSegments(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+int 
+InitWideHorizSegments(XParms xp, Parms p, int reps)
 {
     int size;
 
@@ -294,10 +283,8 @@ int InitWideHorizSegments(xp, p, reps)
 }
  
 
-int InitVertSegments(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+int 
+InitVertSegments(XParms xp, Parms p, int reps)
 {
     int     size;
     int     half;
@@ -354,10 +341,8 @@ int InitVertSegments(xp, p, reps)
     return reps;
 }
 
-int InitWideVertSegments(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+int 
+InitWideVertSegments(XParms xp, Parms p, int reps)
 {
     int size;
 
@@ -373,10 +358,8 @@ int InitWideVertSegments(xp, p, reps)
 }
  
 
-void DoSegments(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoSegments(XParms xp, Parms p, int reps)
 {
     int i;
 
@@ -390,12 +373,12 @@ void DoSegments(xp, p, reps)
             pgc = xp->fggc;
         else
             pgc = xp->bggc;
+	CheckAbort ();
     }
 }
 
-void EndSegments(xp, p)
-    XParms  xp;
-    Parms p;
+void 
+EndSegments(XParms xp, Parms p)
 {
     free(segments);
 }

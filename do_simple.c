@@ -1,4 +1,4 @@
-/* $Xorg: do_simple.c,v 1.5 2000/11/30 12:20:45 pookie Exp $ */
+/* $Xorg: do_simple.c,v 1.4 2000/08/17 19:54:09 cpqbld Exp $ */
 /*****************************************************************************
 Copyright 1988, 1989 by Digital Equipment Corporation, Maynard, Massachusetts.
 
@@ -21,6 +21,7 @@ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
 
 ******************************************************************************/
+/* $XFree86: xc/programs/x11perf/do_simple.c,v 1.6 2001/11/03 21:59:20 dawes Exp $ */
 
 #ifndef VMS
 #include <X11/Xatom.h>
@@ -33,23 +34,20 @@ SOFTWARE.
 static Atom XA_PK_TEMP;
 static Window root;
 
-void DoNoOp(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoNoOp(XParms xp, Parms p, int reps)
 {
     int     i;
 
     for (i = 0; i != reps; i++) {
 	XNoOp(xp->d);
+	CheckAbort ();
     }
 }
 
 
-void DoGetAtom(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoGetAtom(XParms xp, Parms p, int reps)
 {
     char    *atom;
     int     i;
@@ -57,13 +55,12 @@ void DoGetAtom(xp, p, reps)
     for (i = 0; i != reps; i++) {
 	atom = XGetAtomName (xp->d, 1);
  	XFree(atom); /* fix XBUG 6480 */
+	CheckAbort ();
     }
 }
 
-void DoQueryPointer(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoQueryPointer(XParms xp, Parms p, int reps)
 {
     int     i;
     Window  w;
@@ -72,13 +69,12 @@ void DoQueryPointer(xp, p, reps)
 
     for (i = 0; i != reps; i++) {
 	XQueryPointer (xp->d, xp->w, &w, &w, &x, &x, &x, &x, &m);
+	CheckAbort ();
     }
 }
 
-int InitGetProperty(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+int 
+InitGetProperty(XParms xp, Parms p, int reps)
 {
     long foo[4];
 
@@ -94,10 +90,8 @@ int InitGetProperty(xp, p, reps)
     return reps;
 }
 
-void DoGetProperty(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoGetProperty(XParms xp, Parms p, int reps)
 {
     int     i, status;
     int     actual_format;
@@ -111,6 +105,7 @@ void DoGetProperty(xp, p, reps)
 		xp->d, xp->w, XA_PK_TEMP, 0, 4,
 		False, AnyPropertyType, &actual_type, &actual_format,
 		&actual_length, &bytes_remaining, &prop);
+	CheckAbort ();
 	XFree(prop);
     }
 }

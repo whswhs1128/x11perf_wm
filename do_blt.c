@@ -1,4 +1,4 @@
-/* $Xorg: do_blt.c,v 1.4 2000/11/30 12:16:31 pookie Exp $ */
+/* $Xorg: do_blt.c,v 1.3 2000/08/17 19:54:09 cpqbld Exp $ */
 /*****************************************************************************
 Copyright 1988, 1989 by Digital Equipment Corporation, Maynard, Massachusetts.
 
@@ -21,6 +21,7 @@ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
 
 ******************************************************************************/
+/* $XFree86: xc/programs/x11perf/do_blt.c,v 1.9 2001/11/03 21:59:20 dawes Exp $ */
 
 #include "x11perf.h"
 #include <stdio.h>
@@ -34,7 +35,8 @@ static XSegment *segsa, *segsb;
 
 #define NegMod(x, y) ((y) - (((-x)-1) % (7)) - 1)
 
-void InitBltLines()
+static void 
+InitBltLines(void)
 {
     int i, x, y;
 
@@ -61,20 +63,16 @@ void InitBltLines()
     }
 }
 
-int InitScroll(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+int 
+InitScroll(XParms xp, Parms p, int reps)
 {
     InitBltLines();
     XDrawLines(xp->d, xp->w, xp->fggc, points, NUMPOINTS, CoordModeOrigin);
     return reps;
 }
 
-void DoScroll(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoScroll(XParms xp, Parms p, int reps)
 {
     int i, size, x, y, xorg, yorg, delta;
 
@@ -110,27 +108,24 @@ void DoScroll(xp, p, reps)
 		x = xorg;
 	    }
 	}
+	CheckAbort ();
     }
 }
 
-void MidScroll(xp, p)
-    XParms  xp;
-    Parms   p;
+void 
+MidScroll(XParms xp, Parms p)
 {
     XClearWindow(xp->d, xp->w);
     XDrawLines(xp->d, xp->w, xp->fggc, points, NUMPOINTS, CoordModeOrigin);
 }
 
-void EndScroll(xp, p)
-    XParms  xp;
-    Parms   p;
+void 
+EndScroll(XParms xp, Parms p)
 {
 }
 
-static void InitCopyLocations(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+static void 
+InitCopyLocations(XParms xp, Parms p, int reps)
 {
     int x1, y1, x2, y2, size, i;
     int xinc, yinc;
@@ -189,20 +184,16 @@ static void InitCopyLocations(xp, p, reps)
 }
 
 
-int InitCopyWin(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+int 
+InitCopyWin(XParms xp, Parms p, int reps)
 {
     (void) InitScroll(xp, p, reps);
     InitCopyLocations(xp, p, reps);
     return reps;
 }
 
-int InitCopyPix(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+int 
+InitCopyPix(XParms xp, Parms p, int reps)
 {
     GC		pixgc;
     (void) InitCopyWin(xp, p, reps);
@@ -216,10 +207,8 @@ int InitCopyPix(xp, p, reps)
     return reps;
 }
 
-Bool InitGetImage(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+int 
+InitGetImage(XParms xp, Parms p, int reps)
 {
     (void) InitCopyWin(xp, p, reps);
 
@@ -233,21 +222,16 @@ Bool InitGetImage(xp, p, reps)
     return reps;
 }
 
-Bool InitPutImage(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+int 
+InitPutImage(XParms xp, Parms p, int reps)
 {
     if(!InitGetImage(xp, p, reps))return False;
     XClearWindow(xp->d, xp->w);
     return reps;
 }
 
-static void CopyArea(xp, p, reps, src, dst)
-    XParms  xp;
-    Parms   p;
-    int     reps;
-    Drawable src, dst;
+static void 
+CopyArea(XParms xp, Parms p, int reps, Drawable src, Drawable dst)
 {
     int i, size;
     XSegment *sa, *sb;
@@ -262,47 +246,38 @@ static void CopyArea(xp, p, reps, src, dst)
 	    sb->x2, sb->y2, size, size, sb->x1, sb->y1);
 	XCopyArea(xp->d, src, dst, xp->fggc,
 	    sb->x1, sb->y1, size, size, sb->x2, sb->y2);
+	CheckAbort ();
     }
 }
 
-void DoCopyWinWin(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoCopyWinWin(XParms xp, Parms p, int reps)
 {
     CopyArea(xp, p, reps, xp->w, xp->w);
 }
 
-void DoCopyPixWin(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoCopyPixWin(XParms xp, Parms p, int reps)
 {
     CopyArea(xp, p, reps, pix, xp->w);
 }
 
-void DoCopyWinPix(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoCopyWinPix(XParms xp, Parms p, int reps)
 {
     CopyArea(xp, p, reps, xp->w, pix);
     xp->p = pix;	/* HardwareSync will now sync on pixmap */
 }
 
-void DoCopyPixPix(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoCopyPixPix(XParms xp, Parms p, int reps)
 {
     CopyArea(xp, p, reps, pix, pix);
     xp->p = pix;	/* HardwareSync will now sync on pixmap */
 }
 
-void DoGetImage(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoGetImage(XParms xp, Parms p, int reps)
 {
     int i, size;
     XSegment *sa, *sb;
@@ -338,13 +313,12 @@ rectangle.
 	(void) XGetSubImage(xp->d, xp->w, sb->x1, sb->y1, size, size,
 	    xp->planemask, ZPixmap, image, sb->x2, sb->y2);
 */
+	CheckAbort ();
     }
 }
 
-void DoPutImage(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoPutImage(XParms xp, Parms p, int reps)
 {
     int i, size;
     XSegment *sa, *sb;
@@ -359,49 +333,57 @@ void DoPutImage(xp, p, reps)
 	    sb->x2, sb->y2, sb->x2, sb->y2, size, size);
 	XPutImage(xp->d, xp->w, xp->fggc, image,
 	    sb->x1, sb->y1, sb->x2, sb->y2, size, size);
+	CheckAbort ();
     }
 }
 
 #ifdef MITSHM
 
 #include <sys/types.h>
+#ifndef Lynx
 #include <sys/ipc.h>
 #include <sys/shm.h>
+#else
+#include <ipc.h>
+#include <shm.h>
+#endif
 #include <X11/extensions/XShm.h>
 
 static XImage		shm_image;
 static XShmSegmentInfo	shm_info;
 
 static int haderror;
-static int (*origerrorhandler)();
-shmerrorhandler(d,e)
-Display *d;
-XErrorEvent *e;
+static int (*origerrorhandler)(Display *, XErrorEvent *);
+
+static int 
+shmerrorhandler(Display *d, XErrorEvent *e)
 {
     haderror++;
-    if(e->error_code==BadAccess)fprintf(stderr,"failed to attach shared memory\n");
-    else (*origerrorhandler)(d,e);
+    if(e->error_code==BadAccess) {
+	fprintf(stderr,"failed to attach shared memory\n");
+	return 0;
+    } else 
+	return (*origerrorhandler)(d,e);
 }
-int InitShmPutImage (xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+
+int 
+InitShmPutImage(XParms xp, Parms p, int reps)
 {
     int	image_size;
 
     if(!InitGetImage(xp, p, reps))return False;
     if (!XShmQueryExtension(xp->d)) {
 	/*
-	 * Clean up here because cleanup function is not called if this
+ 	 * Clean up here because cleanup function is not called if this
 	 * function fails
 	 */
-	if (image)
-	    XDestroyImage(image);
-	image = NULL;
-	free(segsa);
-	free(segsb);
-	return False;
-    }
+       	if (image)
+      	    XDestroyImage(image);
+    	image = NULL;
+    	free(segsa);
+    	free(segsb);
+    	return False;
+    }	
     XClearWindow(xp->d, xp->w);
     shm_image = *image;
     image_size = image->bytes_per_line * image->height;
@@ -467,10 +449,8 @@ int InitShmPutImage (xp, p, reps)
     return reps;
 }
 
-void DoShmPutImage(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoShmPutImage(XParms xp, Parms p, int reps)
 {
     int i, size;
     XSegment *sa, *sb;
@@ -485,14 +465,13 @@ void DoShmPutImage(xp, p, reps)
 	    sb->x2, sb->y2, sb->x2, sb->y2, size, size, False);
 	XShmPutImage(xp->d, xp->w, xp->fggc, &shm_image,
 	    sb->x1, sb->y1, sb->x2, sb->y2, size, size, False);
+	CheckAbort ();
     }
 }
 
-void EndShmPutImage(xp, p)
-    XParms  xp;
-    Parms   p;
+void 
+EndShmPutImage(XParms xp, Parms p)
 {
-    void    EndGetImage();
 
     EndGetImage (xp, p);
     XShmDetach (xp->d, &shm_info);
@@ -506,25 +485,22 @@ void EndShmPutImage(xp, p)
 #endif
 
 
-void MidCopyPix(xp, p)
-    XParms  xp;
-    Parms   p;
+void 
+MidCopyPix(XParms xp, Parms p)
 {
     XClearWindow(xp->d, xp->w);
 }
 
-void EndCopyWin(xp, p)
-    XParms  xp;
-    Parms   p;
+void 
+EndCopyWin(XParms xp, Parms p)
 {
     EndScroll(xp, p);
     free(segsa);
     free(segsb);
 }
 
-void EndCopyPix(xp, p)
-    XParms  xp;
-    Parms   p;
+void 
+EndCopyPix(XParms xp, Parms p)
 {
     EndCopyWin(xp, p);
     XFreePixmap(xp->d, pix);
@@ -534,18 +510,15 @@ void EndCopyPix(xp, p)
     xp->p = (Pixmap)0;
 }
 
-void EndGetImage(xp, p)
-    XParms  xp;
-    Parms   p;
+void 
+EndGetImage(XParms xp, Parms p)
 {
     EndCopyWin(xp, p);
     if (image) XDestroyImage(image);
 }
 
-Bool InitCopyPlane(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+int
+InitCopyPlane(XParms xp, Parms p, int reps)
 {
     XGCValues   gcv;
     GC		pixgc;
@@ -571,10 +544,8 @@ Bool InitCopyPlane(xp, p, reps)
     return reps;
 }
 
-void DoCopyPlane(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoCopyPlane(XParms xp, Parms p, int reps)
 {
     int		i, size;
     XSegment    *sa, *sb;
@@ -589,6 +560,7 @@ void DoCopyPlane(xp, p, reps)
 	    sb->x2, sb->y2, size, size, sb->x1, sb->y1, 1);
 	XCopyPlane(xp->d, pix, xp->w, xp->fggc,
 	    sb->x1, sb->y1, size, size, sb->x2, sb->y2, 1);
+	CheckAbort ();
     }
 }
 

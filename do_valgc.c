@@ -21,6 +21,7 @@ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
 
 ******************************************************************************/
+/* $XFree86: xc/programs/x11perf/do_valgc.c,v 1.5 2001/01/17 23:45:12 dawes Exp $ */
 
 #ifndef VMS
 #include <X11/Xatom.h>
@@ -31,10 +32,8 @@ SOFTWARE.
 
 static Window win[2];
 
-int InitGC(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+int 
+InitGC(XParms xp, Parms p, int reps)
 {
     win[0] = XCreateSimpleWindow(
 	xp->d, xp->w, 10, 10, 10, 10, 1, xp->foreground, xp->background);
@@ -44,10 +43,8 @@ int InitGC(xp, p, reps)
     return reps;
 }
 
-void DoChangeGC(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoChangeGC(XParms xp, Parms p, int reps)
 {
     int		i;
     XGCValues   gcv;
@@ -68,12 +65,12 @@ void DoChangeGC(xp, p, reps)
         gcv.foreground = xp->foreground;
         XChangeGC(xp->d, xp->fggc, GCForeground , &gcv);
         XDrawPoint(xp->d, win[1], xp->fggc, 5, 5);       
+	CheckAbort ();
     }
 }
 
-void EndGC(xp, p)
-    XParms  xp;
-    Parms   p;
+void 
+EndGC(XParms xp, Parms p)
 {
     XDestroyWindow(xp->d, win[0]);
     XDestroyWindow(xp->d, win[1]);

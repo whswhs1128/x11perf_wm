@@ -21,6 +21,7 @@ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
 
 ******************************************************************************/
+/* $XFree86: xc/programs/x11perf/do_complex.c,v 1.9 2002/05/31 18:46:09 dawes Exp $ */
 
 #include "x11perf.h"
 
@@ -29,16 +30,15 @@ SOFTWARE.
 static XPoint   *points;
 static GC       pgc;
 
-extern double sin();
-extern double cos();
-extern double tan();
-extern double sqrt();
-#define PI  3.14159265357989
+#include <math.h>
+#if defined(QNX4) || defined(__CYGWIN__) || defined(__UNIXOS2__)
+#define PI 3.14159265358979323846
+#else
+#define PI M_PI
+#endif /* QNX4 */
 
-int InitComplexPoly(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+int 
+InitComplexPoly(XParms xp, Parms p, int reps)
 {
     int     i, j, numPoints;
     int     x, y;
@@ -97,10 +97,8 @@ int InitComplexPoly(xp, p, reps)
     return reps;
 }
 
-void DoComplexPoly(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoComplexPoly(XParms xp, Parms p, int reps)
 {
     int     i, j;
     XPoint  *curPoint;
@@ -116,20 +114,18 @@ void DoComplexPoly(xp, p, reps)
             pgc = xp->fggc;
         else
             pgc = xp->bggc;
+	CheckAbort ();
     }
 }
 
-void EndComplexPoly(xp, p)
-    XParms  xp;
-    Parms   p;
+void 
+EndComplexPoly(XParms xp, Parms p)
 {
     free(points);
 }
 
-int InitGeneralPoly (xp,p,reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+int 
+InitGeneralPoly(XParms xp, Parms p, int reps)
 {
     int     i, j, numPoints;
     int	    nsides;
@@ -140,7 +136,7 @@ int InitGeneralPoly (xp,p,reps)
 
     pgc = xp->fggc;
     size = p->special;
-    nsides = (int) p->font;
+    nsides = (long) p->font;
     phi = 0.0;
     delta = 2.0 * PI / ((double) nsides);
     phiinc = delta / 10.0;
@@ -174,18 +170,16 @@ int InitGeneralPoly (xp,p,reps)
     return reps;
 }
 
-void DoGeneralPoly(xp,p,reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoGeneralPoly(XParms xp, Parms p, int reps)
 {
     int     i, j;
     int	    nsides;
     int	    mode;
     XPoint  *curPoint;
 
-    nsides = (int) p->font;
-    mode = (int) p->bfont;
+    nsides = (long) p->font;
+    mode = (long) p->bfont;
     for (i = 0; i != reps; i++) {
         curPoint = points;
         for (j = 0; j != p->objects; j++) {
@@ -197,5 +191,6 @@ void DoGeneralPoly(xp,p,reps)
             pgc = xp->fggc;
         else
             pgc = xp->bggc;
+	CheckAbort ();
     }
 }

@@ -21,6 +21,7 @@ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
 
 ******************************************************************************/
+/* $XFree86: xc/programs/x11perf/do_rects.c,v 1.5 2001/01/17 23:45:11 dawes Exp $ */
 
 #include "x11perf.h"
 #include "bitmaps.h"
@@ -28,10 +29,8 @@ SOFTWARE.
 static XRectangle   *rects;
 static GC	    pgc;
 
-int InitRectangles(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+int 
+InitRectangles(XParms xp, Parms p, int reps)
 {
     int i;
     int size = p->special;
@@ -86,10 +85,8 @@ int InitRectangles(xp, p, reps)
     return reps;
 }
 
-void DoRectangles(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoRectangles(XParms xp, Parms p, int reps)
 {
     int i;
 
@@ -99,13 +96,12 @@ void DoRectangles(xp, p, reps)
             pgc = xp->fggc;
         else
             pgc = xp->bggc;
+	CheckAbort ();
     }
 }
 
-void DoOutlineRectangles (xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int	    reps;
+void 
+DoOutlineRectangles(XParms xp, Parms  p, int reps)
 {
     int	i;
 
@@ -115,12 +111,12 @@ void DoOutlineRectangles (xp, p, reps)
             pgc = xp->fggc;
         else
             pgc = xp->bggc;
+	CheckAbort ();
     }
 }
 
-void EndRectangles(xp, p)
-    XParms  xp;
-    Parms p;
+void 
+EndRectangles(XParms xp, Parms p)
 {
     free(rects);
 }

@@ -1,4 +1,4 @@
-/* $Xorg: do_movewin.c,v 1.5 2000/11/30 12:19:00 pookie Exp $ */
+/* $Xorg: do_movewin.c,v 1.4 2000/08/17 19:54:09 cpqbld Exp $ */
 /*****************************************************************************
 Copyright 1988, 1989 by Digital Equipment Corporation, Maynard, Massachusetts.
 
@@ -21,6 +21,7 @@ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
 
 ******************************************************************************/
+/* $XFree86: xc/programs/x11perf/do_movewin.c,v 1.5 2001/01/17 23:45:11 dawes Exp $ */
 
 #include "x11perf.h"
 
@@ -28,16 +29,14 @@ static Window *children;
 static XPoint *positions;
 static Window cover;
 static int rows;
-static x_offset, y_offset;  /* Private global data for DoMoveWindows */
+static int x_offset, y_offset;  /* Private global data for DoMoveWindows */
 static int xmax, ymax;
-static delta1;		    /* Private global data for DoResizeWindows */
+static int delta1;		/* Private global data for DoResizeWindows */
 
 #define STACK (4*(HEIGHT-10)/CHILDSIZE)
 
-int InitMoveWindows(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+int 
+InitMoveWindows(XParms xp, Parms p, int reps)
 {
     int     i = 0;
 
@@ -65,10 +64,8 @@ int InitMoveWindows(xp, p, reps)
     return reps;
 }
 
-void DoMoveWindows(xp, p, reps)
-    XParms  xp;
-    Parms p;
-    int     reps;
+void 
+DoMoveWindows(XParms xp, Parms p, int reps)
 {
     int     i, j;
 
@@ -83,22 +80,19 @@ void DoMoveWindows(xp, p, reps)
 	    XMoveWindow(xp->d, children[j],
 	    positions[j].x + x_offset, positions[j].y + y_offset);
 	}
+	CheckAbort ();
     }
 }
 
-void EndMoveWindows(xp, p)
-    XParms  xp;
-    Parms   p;
+void 
+EndMoveWindows(XParms xp, Parms p)
 {
-    XDestroySubwindows(xp->d, xp->w);
     free(children);
     free(positions);
 }
 
-void DoResizeWindows(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoResizeWindows(XParms xp, Parms p, int reps)
 {
     int     i, j, delta2;
 
@@ -110,13 +104,12 @@ void DoResizeWindows(xp, p, reps)
 	    XResizeWindow(xp->d, children[j],
 		CHILDSIZE+delta2, CHILDSIZE-delta2);
 	}
+	CheckAbort ();
     }
 }
 
-int InitCircWindows(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+int
+InitCircWindows(XParms xp, Parms p, int reps)
 {
     int     i;
     int     pos;
@@ -135,31 +128,28 @@ int InitCircWindows(xp, p, reps)
     return reps;
 }
 
-void DoCircWindows(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoCircWindows(XParms xp, Parms p, int reps)
 {
     int     i, j;
 
     for (i = 0; i != reps; i++)
+    {
 	for (j = 0; j != p->objects; j++)
 	    XCirculateSubwindows (xp->d, xp->w, RaiseLowest);
+	CheckAbort ();
+    }
 }
 
-void EndCircWindows(xp, p)
-    XParms  xp;
-    Parms   p;
+void 
+EndCircWindows(XParms xp, Parms p)
 {
-    XDestroySubwindows(xp->d, xp->w);
     free(children);
 }
 
 
-int InitMoveTree(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+int 
+InitMoveTree(XParms xp, Parms p, int reps)
 {
     int     i = 0;
 
@@ -191,10 +181,8 @@ int InitMoveTree(xp, p, reps)
     return reps;
 }
 
-void DoMoveTree(xp, p, reps)
-    XParms  xp;
-    Parms p;
-    int     reps;
+void 
+DoMoveTree(XParms xp, Parms p, int reps)
 {
     int     i;
 
@@ -206,12 +194,12 @@ void DoMoveTree(xp, p, reps)
 	if (x_offset + xmax > WIDTH)
 	    x_offset = 0;
 	XMoveWindow(xp->d, cover, x_offset, y_offset);
+	CheckAbort ();
     }
 }
 
-void EndMoveTree(xp, p)
-    XParms  xp;
-    Parms   p;
+void 
+EndMoveTree(XParms xp, Parms p)
 {
     XDestroyWindow(xp->d, cover);
     free(children);

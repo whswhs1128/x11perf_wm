@@ -21,16 +21,15 @@ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
 
 ******************************************************************************/
+/* $XFree86: xc/programs/x11perf/do_dots.c,v 1.5 2001/01/17 23:45:11 dawes Exp $ */
 
 #include "x11perf.h"
 
 static XPoint   *points;
 static GC       pgc;
 
-int InitDots(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+int 
+InitDots(XParms xp, Parms p, int reps)
 {
     int i;
 
@@ -45,10 +44,8 @@ int InitDots(xp, p, reps)
     return reps;
 }
 
-void DoDots(xp, p, reps)
-    XParms  xp;
-    Parms   p;
-    int     reps;
+void 
+DoDots(XParms xp, Parms p, int reps)
 {
     int     i;
 
@@ -58,12 +55,12 @@ void DoDots(xp, p, reps)
             pgc = xp->fggc;
         else
             pgc = xp->bggc;
+	CheckAbort ();
     }
 }
 
-void EndDots(xp, p)
-    XParms  xp;
-    Parms   p;
+void 
+EndDots(XParms xp, Parms p)
 {
     free(points);
 }

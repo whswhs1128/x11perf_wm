@@ -126,7 +126,6 @@ InitFixedTraps(XParms xp, Parms p, int reps)
     int     rows;
     int     x, y;
     int     size, skew;
-    int	    left, right, top, bot;
     XTrap	*curTrap;
     XRenderColor	color;
     int			major, minor;

@@ -21,7 +21,7 @@ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
 
 ****************************************************************************/
-/* $XFree86: xc/programs/x11perf/x11perf.c,v 3.8 2002/12/04 10:28:08 eich Exp $ */
+/* $XFree86$ */
 
 #include <stdio.h>
 #include <ctype.h>

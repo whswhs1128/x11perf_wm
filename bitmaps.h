@@ -21,7 +21,7 @@ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
 
 ******************************************************************************/
-/* $XFree86: xc/programs/x11perf/bitmaps.h,v 1.4 2001/01/17 23:45:11 dawes Exp $ */
+/* $XFree86$ */
 
 /* Set fill style (if any) to a bitmap or tile */
 

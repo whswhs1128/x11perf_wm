@@ -21,7 +21,7 @@ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
 
 ******************************************************************************/
-/* $XFree86: xc/programs/x11perf/do_complex.c,v 1.9 2002/05/31 18:46:09 dawes Exp $ */
+/* $XFree86$ */
 
 #include "x11perf.h"
 

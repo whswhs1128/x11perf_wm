@@ -21,7 +21,7 @@ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
 
 ******************************************************************************/
-/* $XFree86: xc/programs/x11perf/do_rects.c,v 1.5 2001/01/17 23:45:11 dawes Exp $ */
+/* $XFree86$ */
 
 #include "x11perf.h"
 #include "bitmaps.h"

@@ -21,7 +21,7 @@ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
 
 ******************************************************************************/
-/* $XFree86: xc/programs/x11perf/do_tests.c,v 1.10 2002/05/13 06:23:35 keithp Exp $ */
+/* $XFree86: xc/programs/x11perf/do_tests.c,v 1.9 2002/05/13 05:27:37 keithp Exp $ */
 
 #include "x11perf.h"
 

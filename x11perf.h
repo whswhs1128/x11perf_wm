@@ -21,7 +21,7 @@ ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS
 SOFTWARE.
 
 ******************************************************************************/
-/* $XFree86: xc/programs/x11perf/x11perf.h,v 3.6 2002/12/04 10:28:08 eich Exp $ */
+/* $XFree86: xc/programs/x11perf/x11perf.h,v 3.4 2001/07/25 15:05:16 dawes Exp $ */
 
 #ifndef VMS
 #include <X11/Xlib.h>

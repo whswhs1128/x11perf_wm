@@ -58,7 +58,7 @@ dist_man_MANS = \
         Xmark.man
 
 x11perfcomp: x11pcomp.cpp
-	$(SED) s/LIBPATH/`echo $(LIBPATH) | sed -e s/\\\\//\\\\\\\\\\\\\//g`/ < $< | \
+	$(SED) s/LIBPATH/`echo $(LIBPATH) | sed -e s/\\\\//\\\\\\\\\\\\\//g`/ < $(srcdir)/x11pcomp.cpp | \
 		$(SED) s/XCOMM/\#/ > $@
 
 

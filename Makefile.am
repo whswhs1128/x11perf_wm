@@ -28,8 +28,8 @@ LIBPATH = $(libdir)/X11/x11perfcomp
 x11perfcompdir = $(LIBPATH)
 dist_x11perfcomp_SCRIPTS = fillblnk.sh  perfboth.sh  perfratio.sh  Xmark.sh
 
-x11perf_CFLAGS = $(DEP_CFLAGS)
-x11perf_LDADD = $(DEP_LIBS) -lm
+x11perf_CFLAGS = $(X11PERF_CFLAGS)
+x11perf_LDADD = $(X11PERF_LIBS) -lm
 
 x11perf_SOURCES =	\
         bitmaps.c \

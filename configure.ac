@@ -37,8 +37,8 @@ if [[ -z $SED ]] ; then
 fi
 
 # Checks for pkg-config packages
-PKG_CHECK_MODULES(DEP, x11 xmu)
-AC_SUBST(DEP_CFLAGS)
-AC_SUBST(DEP_LIBS)
+PKG_CHECK_MODULES(X11PERF, x11 xmu)
+AC_SUBST(X11PERF_CFLAGS)
+AC_SUBST(X11PERF_LIBS)
 
 AC_OUTPUT([Makefile])

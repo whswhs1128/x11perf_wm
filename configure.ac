@@ -36,6 +36,8 @@ if [[ -z $SED ]] ; then
    AC_MSG_ERROR([sed is needed to build x11perf])
 fi
 
+AC_TYPE_SIGNAL
+
 # Checks for pkg-config packages
 PKG_CHECK_MODULES(X11PERF, x11 xmu)
 AC_SUBST(X11PERF_CFLAGS)

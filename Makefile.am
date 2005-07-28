@@ -63,3 +63,5 @@ x11perfcomp: x11pcomp.cpp
 
 
 CLEANFILES = $(bin_SCRIPTS) x11perfcomp
+
+EXTRA_DIST = x11pcomp.cpp

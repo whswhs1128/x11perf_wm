@@ -22,7 +22,7 @@ dnl
 dnl Process this file with autoconf to create configure.
 
 AC_PREREQ([2.57])
-AC_INIT(x11perf,[7.0], [xorg@freedestkop.org],x11perf)
+AC_INIT(x11perf,[0.99.0], [https://bugs.freedesktop.org/enter_bug.cgi?product=xorg],x11perf)
 AM_INIT_AUTOMAKE([dist-bzip2])
 AM_MAINTAINER_MODE
 
@@ -42,5 +42,7 @@ AC_TYPE_SIGNAL
 PKG_CHECK_MODULES(X11PERF, x11 xmu)
 AC_SUBST(X11PERF_CFLAGS)
 AC_SUBST(X11PERF_LIBS)
+
+XORG_RELEASE_VERSION
 
 AC_OUTPUT([Makefile])

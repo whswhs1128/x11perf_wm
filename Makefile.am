@@ -26,7 +26,7 @@ bin_SCRIPTS = x11perfcomp
 LIBPATH = $(libdir)/X11/x11perfcomp
 
 x11perfcompdir = $(LIBPATH)
-dist_x11perfcomp_SCRIPTS = fillblnk.sh  perfboth.sh  perfratio.sh  Xmark.sh
+dist_x11perfcomp_SCRIPTS = fillblnk perfboth perfratio Xmark
 
 x11perf_CFLAGS = $(X11PERF_CFLAGS)
 x11perf_LDADD = $(X11PERF_LIBS) -lm

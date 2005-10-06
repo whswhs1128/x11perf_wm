@@ -53,7 +53,7 @@ x11perf_SOURCES =	\
         x11perf.h
 
 dist_man1_MANS = \
-        x11pcomp.man \
+        x11perfcomp.man \
         x11perf.man \
         Xmark.man
 

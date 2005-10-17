@@ -68,7 +68,7 @@ EXTRA_DIST = x11pcomp.cpp
 
 appmandir =  $(mandir)/man$(APP_MAN_SUFFIX)
 
-appman_DATA = $(appman_SOURCES:man=$(APP_MAN_SUFFIX))
+appman_DATA = $(appman_SOURCES:man=@APP_MAN_SUFFIX@)
 
 EXTRA_DIST += $(appman_SOURCES)
 CLEANFILES += $(appman_DATA)

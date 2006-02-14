@@ -1,3 +1,10 @@
+2006-02-13  Eric Anholt  <anholt@FreeBSD.org>
+
+	* configure.ac:
+	* x11perf.c:
+	* x11perf.h:
+	Detect when Render is available and turn those tests on.
+
 2005-12-20  Kevin E. Martin  <kem-at-freedesktop-dot-org>
 
 	* configure.ac:

@@ -1,3 +1,12 @@
+2006-02-14  Keith Packard  <keithp@keithp.com>
+
+	* Makefile.am:
+	* configure.ac:
+	* x11perf.h:
+	Split detection of Xrender and Xft.
+	Add detection of MIT-SHM.
+	Clean up CFLAGS in Makefile.am
+
 2006-02-13  Eric Anholt  <anholt@FreeBSD.org>
 
 	* configure.ac:

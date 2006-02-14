@@ -42,12 +42,40 @@ AC_TYPE_SIGNAL
 PKG_CHECK_MODULES(X11PERF, x11 xmuu)
 AC_SUBST(X11PERF_CFLAGS)
 AC_SUBST(X11PERF_LIBS)
-PKG_CHECK_MODULES(XRENDER, xrender xft, have_xrender=yes, have_xrender=no)
-if test "x$have_xrender" = "xyes"; then
-	AC_DEFINE(XRENDER, 1, [Define to 1 if you have xrender and xft])
-	X11PERF_CFLAGS="$X11PERF_CFLAGS $XRENDER_CFLAGS"
-	X11PERF_LIBS="$X11PERF_LIBS $XRENDER_LIBS"
-fi
+
+# Check for Xrender library
+PKG_CHECK_MODULES(XRENDER, xrender, [xrender_found=yes], [xrender_found=no])
+AC_SUBST(XRENDER_CFLAGS)
+AC_SUBST(XRENDER_LIBS)
+case "$xrender_found" in
+yes)
+	AC_DEFINE(XRENDER,1,[Xrender library available])
+	;;
+esac
+
+# Check for Xft library
+PKG_CHECK_MODULES(XFT, xft, [xft_found=yes], [xft_found=no])
+AC_SUBST(XFT_CFLAGS)
+AC_SUBST(XFT_LIBS)
+case "$xft_found" in
+yes)
+	AC_DEFINE(XFT,1,[Xft library available])
+	;;
+esac
+
+# Check for MIT-SHM extension
+PKG_CHECK_MODULES(XEXT, xext, [xext_found=yes], [xext_found=no])
+AC_SUBST(XEXT_CFLAGS)
+AC_SUBST(XEXT_LIBS)
+case "$xext_found" in
+yes)
+	save_LIBS="$LIBS"
+	LIBS="$XEXT_LIBS $LIBS"
+	AC_CHECK_FUNCS([XShmQueryExtension], 
+		       AC_DEFINE(MITSHM, 1, [MIT-SHM extension available]))
+	LIBS="$save_LIBS"
+	;;
+esac
 
 XORG_MANPAGE_SECTIONS
 XORG_RELEASE_VERSION

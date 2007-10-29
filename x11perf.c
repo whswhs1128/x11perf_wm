@@ -647,6 +647,7 @@ DoTest(XParms xp, Test *test, int reps)
     HardwareSync(xp);
 
     time = ElapsedTime(syncTime);
+    if (time < 0.0) time = 0.0;
     CheckAbort ();
     if (drawToFakeServer)
         XQueryBestSize(xp->d, TileShape, tileToQuery,

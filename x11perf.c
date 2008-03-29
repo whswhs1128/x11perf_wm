@@ -164,6 +164,9 @@ static int GetNumbers(int argi, int argc, char **argv, unsigned long *intsp,
 static int GetRops(int argi, int argc, char **argv, int *ropsp, int *nump);
 static int GetPops(int argi, int argc, char **argv, int *popsp, int *nump);
 static int GetFormats(int argi, int argc, char **argv, int *formatsp, int *nump);
+static int FormatFromName (char *name);
+static char *NameFromFormat (int format);
+
 
 /************************************************
 *	    time related stuff			*
@@ -1389,10 +1392,11 @@ main(int argc, char *argv[])
 					     LABELP(i));
 				}
 			    } else {
+				char *name = NameFromFormat (formats[format]);
 				sprintf (label, "(%s %s) %s",
-					popNames[pops[pop]].name,
-					formatNames[formats[format]].name,
-					LABELP(i));
+					 popNames[pops[pop]].name,
+					 name,
+					 LABELP(i));
 			    }
 			    ProcessTest (&xparms, &test[i], pops[pop], formats[format], label);
 			}
@@ -1452,7 +1456,7 @@ atox (char *s)
     return v;
 }
 
-static int 
+static int
 GetNumbers (int argi, int argc, char **argv, unsigned long *intsp, int *nump)
 {
     char    *words[256];
@@ -1540,6 +1544,26 @@ GetPops (int argi, int argc, char **argv, int *popsp, int *nump)
 }
 
 static int
+FormatFromName (char *name)
+{
+    int i;
+    for (i = 0; i < NUM_FORMATS; i++)
+	if (!strcmp (name, formatNames[i].name))
+	    return formatNames[i].rop;
+    return -1;
+}
+
+static char *
+NameFromFormat (int format)
+{
+    int i;
+    for (i = 0; i < NUM_FORMATS; i++)
+	if (formatNames[i].rop == format)
+	    return formatNames[i].name;
+    return NULL;
+}
+
+static int
 GetFormats (int argi, int argc, char **argv, int *formatsp, int *nump)
 {
     char    *words[256];
@@ -1555,16 +1579,12 @@ GetFormats (int argi, int argc, char **argv, int *formatsp, int *nump)
 	    *nump = NUM_FORMATS;
 	    break;
 	}
-	for (format = 0; format < NUM_FORMATS; format++) {
-	    if (!strcmp (words[i], formatNames[format].name)) {
-		formatsp[i] = formatNames[format].rop;
-		break;
-	    }
-	}
-	if (format == NUM_FORMATS) {
+	format = FormatFromName (words[i]);
+	if (format < 0) {
 	    usage ();
 	    fprintf (stderr, "unknown format name %s\n", words[i]);
 	}
+	formatsp[i] = format;
     }
     return count;
 }

@@ -614,8 +614,14 @@ int
 InitCompositeWin(XParms xp, Parms p, int reps)
 {
     XRenderPictFormat	*format;
+    int	mul = 1, div = 1;
+
+    if (p->fillStyle) {
+	mul = 0x10000;
+	div = p->fillStyle;
+    }
     (void) InitScroll (xp, p, reps);
-    InitCopyLocations (xp, p, reps);
+    InitCopyLocations (xp, p, reps, mul, div);
     format = XRenderFindVisualFormat (xp->d, xp->vinfo.visual);
     winPict = XRenderCreatePicture (xp->d, xp->w, format, 0, NULL);
     return reps;
@@ -660,6 +666,14 @@ InitCompositePix(XParms xp, Parms p, int reps)
     pix = XCreatePixmap(xp->d, xp->w, WIDTH, HEIGHT, depth);
     pixPict = XRenderCreatePicture (xp->d, pix, format, 0, NULL);
     
+    if (p->fillStyle) {
+	XTransform		transform;
+	memset (&transform, '\0', sizeof (transform));
+	transform.matrix[0][0] = 0x10000;
+	transform.matrix[1][1] = 0x10000;
+	transform.matrix[2][2] = p->fillStyle;
+	XRenderSetPictureTransform (xp->d, pixPict, &transform);
+    }
     XRenderComposite (xp->d, PictOpClear,
 		      winPict, None, pixPict,
 		      0, 0, 0, 0, 0, 0, WIDTH, HEIGHT);

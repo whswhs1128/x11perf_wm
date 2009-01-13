@@ -22,3 +22,7 @@ x11perf.1
 x11perfcomp
 x11perfcomp.1
 *~
+*.o
+x11perf-*.tar.*
+ChangeLog
+tags

@@ -33,7 +33,7 @@ x11perfcomp \- X11 server performance comparison program
 The
 .I x11perfcomp
 program merges the output of several
-.I x11perf(1)
+.I x11perf(__appmansuffix__)
 runs into a nice tabular
 format.  It takes the results in each file, fills in any missing test results if
 necessary, and for each test shows the objects/second rate of each server.
@@ -73,7 +73,7 @@ Specifies a label file to use.
 .SH X DEFAULTS
 There are no X defaults used by this program.
 .SH "SEE ALSO"
-X(__miscmansuffix__), x11perf(1)
+X(__miscmansuffix__), x11perf(__appmansuffix__)
 .SH AUTHORS
 Mark Moraes wrote the original scripts to compare servers.
 .br

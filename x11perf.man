@@ -86,7 +86,7 @@ may be able to use the numbers
 reports to predict its performance on a given X implementation.
 .PP
 That said, you might also want to look at
-.I x11perfcomp(1),
+.I x11perfcomp(__appmansuffix__),
 a program to compare the outputs of different
 .I x11perf
 runs.  You provide a list of files containing results from
@@ -1001,7 +1001,7 @@ Circulate unmapped window to top.
 .SH X DEFAULTS
 There are no X defaults used by this program.
 .SH "SEE ALSO"
-X(__miscmansuffix__), x11perfcomp(1)
+X(__miscmansuffix__), x11perfcomp(__appmansuffix__)
 .SH AUTHORS
 Joel McCormack
 .br

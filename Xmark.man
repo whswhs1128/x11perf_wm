@@ -63,4 +63,4 @@ by x11perf in the expected way.
 .BR "Diagnostic: ERROR: sum of weights =" nnn ", not equal to 4566.0;"
 There is an internal error in Xmark.
 .SH "SEE ALSO"
-X(__miscmansuffix__), x11perf(1), x11perfcomp(1)
+X(__miscmansuffix__), x11perf(__appmansuffix__), x11perfcomp(__appmansuffix__)

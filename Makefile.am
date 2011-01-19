@@ -19,6 +19,7 @@
 #  TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 #  PERFORMANCE OF THIS SOFTWARE.
 
+SUBDIRS = man
 bin_PROGRAMS = x11perf
 
 bin_SCRIPTS = x11perfcomp
@@ -52,34 +53,14 @@ x11perf_SOURCES =	\
         x11perf.c \
         x11perf.h
 
-appman_PRE = \
-        x11perfcomp.man \
-        x11perf.man \
-        Xmark.man
-
 x11perfcomp: x11pcomp.cpp
 	$(AM_V_GEN)$(SED) s/LIBPATH/`echo $(LIBPATH) | sed -e s/\\\\//\\\\\\\\\\\\\//g`/ < $(srcdir)/x11pcomp.cpp | \
 		$(SED) s/XCOMM/\#/ > $@
 
-
-MAINTAINERCLEANFILES = ChangeLog INSTALL
 CLEANFILES = $(bin_SCRIPTS) x11perfcomp
-
 EXTRA_DIST = x11pcomp.cpp
 
-appmandir = $(APP_MAN_DIR)
-
-appman_DATA = $(appman_PRE:man=@APP_MAN_SUFFIX@)
-
-EXTRA_DIST += $(appman_PRE)
-CLEANFILES += $(appman_DATA)
-
-SUFFIXES = .$(APP_MAN_SUFFIX) .man
-
-# String replacements in MAN_SUBSTS now come from xorg-macros.m4 via configure
-.man.$(APP_MAN_SUFFIX):
-	$(AM_V_GEN)$(SED) $(MAN_SUBSTS) < $< > $@
-
+MAINTAINERCLEANFILES = ChangeLog INSTALL
 
 .PHONY: ChangeLog INSTALL
 

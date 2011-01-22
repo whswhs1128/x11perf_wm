@@ -20,14 +20,8 @@
 #  PERFORMANCE OF THIS SOFTWARE.
 
 SUBDIRS = man
+
 bin_PROGRAMS = x11perf
-
-bin_SCRIPTS = x11perfcomp
-
-LIBPATH = $(libdir)/X11/x11perfcomp
-
-x11perfcompdir = $(LIBPATH)
-dist_x11perfcomp_SCRIPTS = fillblnk perfboth perfratio Xmark
 
 AM_CFLAGS = $(CWARNFLAGS) $(XEXT_CFLAGS) $(XFT_CFLAGS) $(XRENDER_CFLAGS) $(X11PERF_CFLAGS)
 x11perf_LDADD = $(XEXT_LIBS) $(XFT_LIBS) $(XRENDER_LIBS) $(X11PERF_LIBS) -lm
@@ -53,12 +47,19 @@ x11perf_SOURCES =	\
         x11perf.c \
         x11perf.h
 
-x11perfcomp: x11pcomp.cpp
-	$(AM_V_GEN)$(SED) s/LIBPATH/`echo $(LIBPATH) | sed -e s/\\\\//\\\\\\\\\\\\\//g`/ < $(srcdir)/x11pcomp.cpp | \
-		$(SED) s/XCOMM/\#/ > $@
+bin_SCRIPTS = x11perfcomp
+CLEANFILES = $(bin_SCRIPTS)
+EXTRA_DIST = $(bin_SCRIPTS:=.in)
+DIR_SUBSTS = -e 's|@x11perfcompdir[@]|$(x11perfcompdir)|g'
 
-CLEANFILES = $(bin_SCRIPTS) x11perfcomp
-EXTRA_DIST = x11pcomp.cpp
+x11perfcomp: x11perfcomp.in
+	$(AM_V_GEN)$(SED) $(DIR_SUBSTS) < $< > $@
+
+dist_x11perfcomp_SCRIPTS = 	\
+	fillblnk		\
+	perfboth		\
+	perfratio		\
+	Xmark
 
 MAINTAINERCLEANFILES = ChangeLog INSTALL
 

@@ -53,7 +53,7 @@ EXTRA_DIST = $(bin_SCRIPTS:=.in)
 DIR_SUBSTS = -e 's|@x11perfcompdir[@]|$(x11perfcompdir)|g'
 
 x11perfcomp: x11perfcomp.in
-	$(AM_V_GEN)$(SED) $(DIR_SUBSTS) < $< > $@
+	$(AM_V_GEN)$(SED) $(DIR_SUBSTS) < $(srcdir)/$@.in > $@
 
 dist_x11perfcomp_SCRIPTS = 	\
 	fillblnk		\

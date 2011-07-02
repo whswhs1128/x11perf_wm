@@ -1,7 +1,5 @@
 #! /bin/sh
 #
-# $XFree86$
-#
 # Collects multiple outputs of x11perf.  Just feed it a list of files, each
 # containing the output from an x11perf run, and this shell will extract the
 # object/second information and show it in tabular form.  An 80-column line

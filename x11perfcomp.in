@@ -23,10 +23,17 @@
 PATH="@x11perfcompdir@:/bin:/usr/bin:$PATH"
 export PATH
 
+MKTEMP="@MKTEMP@"
+
 set -e
-tmp=${TMPDIR-/tmp}/rates.$$
+if [ "x$MKTEMP" != "x" ] && [ -x "$MKTEMP" ] ; then
+    tmp=`$MKTEMP -p /tmp -d rates.XXXXXX`
+    if [ "x$tmp" = "x" ]; then exit 1 ; fi
+else
+    tmp=${TMPDIR-/tmp}/rates.$$
+    mkdir $tmp || exit 1
+fi
 trap "rm -rf $tmp" 0 1 2 15
-mkdir $tmp || exit 1
 mkdir $tmp/rates
 ratio=
 allfiles=

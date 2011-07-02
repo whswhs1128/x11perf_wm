@@ -44,6 +44,9 @@ AC_TYPE_SIGNAL
 # Define the installation directory for the x11 performance compare scripts
 AC_SUBST([x11perfcompdir], [$libdir/X11/x11perfcomp])
 
+# Checks for programs run by the scripts we install
+AC_PATH_PROG(MKTEMP, mktemp)
+
 # Checks for pkg-config packages
 PKG_CHECK_MODULES(X11PERF, x11 xmuu)
 

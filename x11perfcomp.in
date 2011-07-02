@@ -20,7 +20,7 @@
 # Joel McCormack, DEC Western Research Lab <joel@decwrl.dec.com>
 #
 
-PATH=@x11perfcompdir@:.:$PATH
+PATH="@x11perfcompdir@:/bin:/usr/bin:$PATH"
 export PATH
 
 set -e

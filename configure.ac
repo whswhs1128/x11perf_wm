@@ -79,7 +79,6 @@ yes)
 esac
 
 AC_CONFIG_FILES([
-	x11perfcomp
 	Makefile
 	man/Makefile])
 AC_OUTPUT

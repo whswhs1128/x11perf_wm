@@ -74,7 +74,7 @@ typedef struct _Parms {
 
     /* Optional fields.  (Wouldn't object-oriented programming be nice ?)   */
     int  special;       /* Usually size of objects to paint		    */
-    char *font, *bfont;
+    const char *font, *bfont;
     int  fillStyle;     /* Solid, transparent stipple, opaque stipple, tile */
 } ParmRec, *Parms;
 
@@ -115,9 +115,9 @@ typedef enum {
 } TestType;
 
 typedef struct _Test {
-    char	*option;    /* Name to use in prompt line		    */
-    char	*label;     /* Fuller description of test		    */
-    char	*label14;   /* Labels that are different in Version 1.4     */
+    const char	*option;    /* Name to use in prompt line		    */
+    const char	*label;     /* Fuller description of test		    */
+    const char	*label14;   /* Labels that are different in Version 1.4     */
     InitProc    init;       /* Initialization procedure			    */
     Proc	proc;       /* Timed benchmark procedure		    */
     CleanupProc	passCleanup;/* Cleanup between repetitions of same test     */

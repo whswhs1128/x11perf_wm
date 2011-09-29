@@ -45,7 +45,7 @@ static Pixmap   tileToQuery     = None;
 static char *displayName;
 int	abortTest;
 
-typedef struct _RopNames { char	*name; int  rop; } RopNameRec, *RopNamePtr;
+typedef struct _RopNames { const char	*name; int  rop; } RopNameRec, *RopNamePtr;
 
 static RopNameRec ropNames[] = {
 	{ "clear",    	  GXclear },		/* 0 */
@@ -92,7 +92,7 @@ static RopNameRec formatNames[] = {
     { "NATIVE",	  PictStandardNative },
 };
 
-static char *(visualClassNames)[] = {
+static const char *(visualClassNames)[] = {
     "StaticGray",
     "GrayScale",
     "StaticColor",
@@ -126,9 +126,9 @@ static int  formats[NUM_FORMATS] = { PictStandardNative };
 static int  numPlanemasks = 1;
 static unsigned long planemasks[256] = { (unsigned long)~0 };
 
-static char *foreground = NULL;
-static char *background = NULL;
-static char *ddbackground = NULL;
+static const char *foreground = NULL;
+static const char *background = NULL;
+static const char *ddbackground = NULL;
 static int clips = 0;
 
 static int numSubWindows = 7;
@@ -473,9 +473,9 @@ AbortTest(void)
 static void 
 usage(void)
 {
-    char    **cpp;
+    const char    **cpp;
     int     i = 0;
-    static char *help_message[] = {
+    static const char *help_message[] = {
 "where options include:",
 "    -display <host:display>   the X server to contact",
 "    -sync                     do the tests in synchronous mode",
@@ -798,7 +798,7 @@ DestroyPerfGCs(XParms xp)
 }
 
 static unsigned long 
-AllocateColor(Display *display, char *name, unsigned long pixel)
+AllocateColor(Display *display, const char *name, unsigned long pixel)
 {
     XColor      color;
 
@@ -823,7 +823,7 @@ AllocateColor(Display *display, char *name, unsigned long pixel)
 
 
 static void 
-DisplayStatus(Display *d, char *message, char *test, int try)
+DisplayStatus(Display *d, const char *message, const char *test, int try)
 {
     char    s[500];
 

@@ -316,7 +316,7 @@ ReportTimes(double usecs, long long n, char *str, int average)
 ************************************************/
 
 static char *program_name;
-static void usage(void);
+static void usage(void) _X_NORETURN;
 
 /*
  * Get_Display_Name (argc, argv) Look for -display, -d, or host:dpy (obselete)

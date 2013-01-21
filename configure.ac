@@ -48,7 +48,7 @@ AC_SUBST([x11perfcompdir], [$libdir/X11/x11perfcomp])
 AC_PATH_PROG(MKTEMP, mktemp)
 
 # Checks for pkg-config packages
-PKG_CHECK_MODULES(X11PERF, x11 xmuu)
+PKG_CHECK_MODULES(X11PERF, [x11 xmuu xproto >= 7.0.17])
 
 # Check for Xrender library
 PKG_CHECK_MODULES(XRENDER, xrender, [xrender_found=yes], [xrender_found=no])

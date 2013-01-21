@@ -135,7 +135,7 @@ extern Test test[];
 
 extern int abortTest;
 
-extern void AbortTest (void);
+extern void AbortTest (void) _X_NORETURN;
 
 #define CheckAbort()  if (abortTest) AbortTest ()
 #define ForEachTest(x) for (x = 0; test[x].option != NULL; x++)

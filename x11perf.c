@@ -438,16 +438,6 @@ Open_Display(char *display_name)
     return(d);
 }
 
-
-/* defined by autoconf AC_TYPE_SIGNAL, need to define for Imake */
-#ifndef RETSIGTYPE 
-# ifdef SIGNALRETURNSINT
-#  define RETSIGTYPE int
-# else
-#  define RETSIGTYPE void
-# endif
-#endif
-
 static RETSIGTYPE
 Cleanup(int sig)
 {

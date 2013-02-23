@@ -39,8 +39,6 @@ m4_ifndef([XORG_MACROS_VERSION],
 XORG_MACROS_VERSION(1.8)
 XORG_DEFAULT_OPTIONS
 
-AC_TYPE_SIGNAL
-
 # Define the installation directory for the x11 performance compare scripts
 AC_SUBST([x11perfcompdir], [$libdir/X11/x11perfcomp])
 

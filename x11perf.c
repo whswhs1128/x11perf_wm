@@ -438,7 +438,7 @@ Open_Display(char *display_name)
     return(d);
 }
 
-static RETSIGTYPE
+static void
 Cleanup(int sig)
 {
     abortTest = sig;

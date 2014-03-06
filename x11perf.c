@@ -24,6 +24,7 @@ SOFTWARE.
 #include <stdio.h>
 #include <ctype.h>
 #include <signal.h>
+#include <stdint.h>
 
 #ifndef VMS
 #include <X11/Xatom.h>
@@ -285,7 +286,7 @@ RoundTo3Digits(double d)
 
 
 static void 
-ReportTimes(double usecs, long long n, char *str, int average)
+ReportTimes(double usecs, int64_t n, char *str, int average)
 {
     double msecsperobj, objspersec;
 
@@ -299,15 +300,15 @@ ReportTimes(double usecs, long long n, char *str, int average)
         objspersec =  RoundTo3Digits(objspersec);
 
         if (average) {
-	    printf("%7lld trep @ %8.4f msec (%8.1f/sec): %s\n",
-		    n, msecsperobj, objspersec, str);
+	    printf("%11lld trep @ %8.4f msec (%8.1f/sec): %s\n", 
+                   (long long) n, msecsperobj, objspersec, str);
 	} else {
-	    printf("%7lld reps @ %8.4f msec (%8.1f/sec): %s\n",
-	        n, msecsperobj, objspersec, str);
+	    printf("%11lld reps @ %8.4f msec (%8.1f/sec): %s\n", 
+                   (long long) n, msecsperobj, objspersec, str);
 	}
     } else {
 	printf("%6lld %sreps @ 0.0 msec (unmeasurably fast): %s\n",
-	    n, average ? "t" : "", str);
+               (long long) n, average ? "t" : "", str);
     }
 
 }
@@ -526,7 +527,7 @@ NullProc(XParms xp, Parms p)
 }
 
 int 
-NullInitProc(XParms xp, Parms p, int reps)
+NullInitProc(XParms xp, Parms p, int64_t reps)
 {
     return reps;
 }
@@ -548,7 +549,7 @@ HardwareSync(XParms xp)
 }
 
 static void 
-DoHardwareSync(XParms xp, Parms p, int reps)    
+DoHardwareSync(XParms xp, Parms p, int64_t reps)    
 {
     int i;
     
@@ -626,7 +627,7 @@ DestroyClipWindows(XParms xp, int clips)
 
 
 static double 
-DoTest(XParms xp, Test *test, int reps)
+DoTest(XParms xp, Test *test, int64_t reps)
 {
     double  time;
     unsigned int ret_width, ret_height;
@@ -650,7 +651,7 @@ DoTest(XParms xp, Test *test, int reps)
 }
 
 
-static int 
+static int64_t
 CalibrateTest(XParms xp, Test *test, int seconds, double *usecperobj)
 {
 #define goal    2500000.0   /* Try to get up to 2.5 seconds		    */
@@ -658,7 +659,7 @@ CalibrateTest(XParms xp, Test *test, int seconds, double *usecperobj)
 #define tick      10000.0   /* Assume clock not faster than .01 seconds     */
 
     double  usecs;
-    int     reps, didreps;  /* Reps desired, reps performed		    */
+    int64_t reps, didreps;  /* Reps desired, reps performed		    */
     int     exponent;
 
     /* Attempt to get an idea how long each rep lasts by getting enough
@@ -875,8 +876,8 @@ ProcessTest(XParms xp, Test *test, int func, unsigned long pm, char *label)
 	}
 	if (repeat > 1) {
 	    ReportTimes(totalTime,
-		repeat * reps * test->parms.objects,
-		label, True);
+                        repeat * reps * test->parms.objects,
+                        label, True);
 	}
 	(*test->cleanup) (xp, &test->parms);
 	DestroyClipWindows(xp, test->clips);

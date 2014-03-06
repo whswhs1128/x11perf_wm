@@ -63,7 +63,7 @@ InitBltLines(void)
 }
 
 int 
-InitScroll(XParms xp, Parms p, int reps)
+InitScroll(XParms xp, Parms p, int64_t reps)
 {
     InitBltLines();
     XDrawLines(xp->d, xp->w, xp->fggc, points, NUMPOINTS, CoordModeOrigin);
@@ -71,7 +71,7 @@ InitScroll(XParms xp, Parms p, int reps)
 }
 
 void 
-DoScroll(XParms xp, Parms p, int reps)
+DoScroll(XParms xp, Parms p, int64_t reps)
 {
     int i, size, x, y, xorg, yorg, delta;
 
@@ -125,7 +125,7 @@ EndScroll(XParms xp, Parms p)
 
 static void 
 InitCopyLocations(int size, int mul, int div, 
-		  int reps, XSegment **ap, XSegment **bp)
+		  int64_t reps, XSegment **ap, XSegment **bp)
 {
     int x1, y1, x2, y2, i;
     int xinc, yinc;
@@ -186,7 +186,7 @@ InitCopyLocations(int size, int mul, int div,
 
 
 int 
-InitCopyWin(XParms xp, Parms p, int reps)
+InitCopyWin(XParms xp, Parms p, int64_t reps)
 {
     (void) InitScroll(xp, p, reps);
     InitCopyLocations(p->special, 1, 1, reps, &segsa, &segsb);
@@ -194,7 +194,7 @@ InitCopyWin(XParms xp, Parms p, int reps)
 }
 
 int 
-InitCopyPix(XParms xp, Parms p, int reps)
+InitCopyPix(XParms xp, Parms p, int64_t reps)
 {
     GC		pixgc;
     (void) InitCopyWin(xp, p, reps);
@@ -209,7 +209,7 @@ InitCopyPix(XParms xp, Parms p, int reps)
 }
 
 int 
-InitGetImage(XParms xp, Parms p, int reps)
+InitGetImage(XParms xp, Parms p, int64_t reps)
 {
     (void) InitCopyWin(xp, p, reps);
 
@@ -224,7 +224,7 @@ InitGetImage(XParms xp, Parms p, int reps)
 }
 
 int 
-InitPutImage(XParms xp, Parms p, int reps)
+InitPutImage(XParms xp, Parms p, int64_t reps)
 {
     if(!InitGetImage(xp, p, reps))return False;
     XClearWindow(xp->d, xp->w);
@@ -232,7 +232,7 @@ InitPutImage(XParms xp, Parms p, int reps)
 }
 
 static void 
-CopyArea(XParms xp, Parms p, int reps, Drawable src, Drawable dst)
+CopyArea(XParms xp, Parms p, int64_t reps, Drawable src, Drawable dst)
 {
     int i, size;
     XSegment *sa, *sb;
@@ -252,33 +252,33 @@ CopyArea(XParms xp, Parms p, int reps, Drawable src, Drawable dst)
 }
 
 void 
-DoCopyWinWin(XParms xp, Parms p, int reps)
+DoCopyWinWin(XParms xp, Parms p, int64_t reps)
 {
     CopyArea(xp, p, reps, xp->w, xp->w);
 }
 
 void 
-DoCopyPixWin(XParms xp, Parms p, int reps)
+DoCopyPixWin(XParms xp, Parms p, int64_t reps)
 {
     CopyArea(xp, p, reps, pix, xp->w);
 }
 
 void 
-DoCopyWinPix(XParms xp, Parms p, int reps)
+DoCopyWinPix(XParms xp, Parms p, int64_t reps)
 {
     CopyArea(xp, p, reps, xp->w, pix);
     xp->p = pix;	/* HardwareSync will now sync on pixmap */
 }
 
 void 
-DoCopyPixPix(XParms xp, Parms p, int reps)
+DoCopyPixPix(XParms xp, Parms p, int64_t reps)
 {
     CopyArea(xp, p, reps, pix, pix);
     xp->p = pix;	/* HardwareSync will now sync on pixmap */
 }
 
 void 
-DoGetImage(XParms xp, Parms p, int reps)
+DoGetImage(XParms xp, Parms p, int64_t reps)
 {
     int i, size;
     XSegment *sa, *sb;
@@ -319,7 +319,7 @@ rectangle.
 }
 
 void 
-DoPutImage(XParms xp, Parms p, int reps)
+DoPutImage(XParms xp, Parms p, int64_t reps)
 {
     int i, size;
     XSegment *sa, *sb;
@@ -368,7 +368,7 @@ shmerrorhandler(Display *d, XErrorEvent *e)
 }
 
 static int
-InitShmImage(XParms xp, Parms p, int reps, Bool read_only)
+InitShmImage(XParms xp, Parms p, int64_t reps, Bool read_only)
 {
     int	image_size;
 
@@ -450,7 +450,7 @@ InitShmImage(XParms xp, Parms p, int reps, Bool read_only)
 }
 
 int
-InitShmPutImage(XParms xp, Parms p, int reps)
+InitShmPutImage(XParms xp, Parms p, int64_t reps)
 {
     if (!InitShmImage(xp, p, reps, True)) return False;
     XClearWindow(xp->d, xp->w);
@@ -458,13 +458,13 @@ InitShmPutImage(XParms xp, Parms p, int reps)
 }
 
 int
-InitShmGetImage(XParms xp, Parms p, int reps)
+InitShmGetImage(XParms xp, Parms p, int64_t reps)
 {
     return InitShmImage(xp, p, reps, False);
 }
 
-void
-DoShmPutImage(XParms xp, Parms p, int reps)
+void 
+DoShmPutImage(XParms xp, Parms p, int64_t reps)
 {
     int i, size;
     XSegment *sa, *sb;
@@ -484,7 +484,7 @@ DoShmPutImage(XParms xp, Parms p, int reps)
 }
 
 void
-DoShmGetImage(XParms xp, Parms p, int reps)
+DoShmGetImage(XParms xp, Parms p, int64_t reps)
 {
     int i, size;
     XSegment *sa, *sb;
@@ -568,7 +568,7 @@ EndGetImage(XParms xp, Parms p)
 }
 
 int
-InitCopyPlane(XParms xp, Parms p, int reps)
+InitCopyPlane(XParms xp, Parms p, int64_t reps)
 {
     XGCValues   gcv;
     GC		pixgc;
@@ -595,7 +595,7 @@ InitCopyPlane(XParms xp, Parms p, int reps)
 }
 
 void 
-DoCopyPlane(XParms xp, Parms p, int reps)
+DoCopyPlane(XParms xp, Parms p, int64_t reps)
 {
     int		i, size;
     XSegment    *sa, *sb;
@@ -619,7 +619,7 @@ DoCopyPlane(XParms xp, Parms p, int reps)
 static Picture	winPict, pixPict;
 
 int
-InitCompositeWin(XParms xp, Parms p, int reps)
+InitCompositeWin(XParms xp, Parms p, int64_t reps)
 {
     XRenderPictFormat	*format;
 
@@ -636,10 +636,11 @@ InitCompositeWin(XParms xp, Parms p, int reps)
 }
 
 int
-InitCompositePix(XParms xp, Parms p, int reps)
+InitCompositePix(XParms xp, Parms p, int64_t reps)
 {
     XRenderPictFormat	*format = NULL;
     int			depth;
+    static XRenderColor c = { 0xffff, 0x0000, 0xffff, 0xffff };
 
     (void) InitCompositeWin (xp, p, reps);
     
@@ -678,7 +679,6 @@ InitCompositePix(XParms xp, Parms p, int reps)
 		      winPict, None, pixPict,
 		      0, 0, 0, 0, 0, 0, WIDTH, HEIGHT);
     
-    static XRenderColor c = { 0xffff, 0x0000, 0xffff, 0xffff };
     XRenderFillRectangle (xp->d, PictOpSrc,
 			  pixPict, &c, 0, 0, WIDTH, HEIGHT);
 #if 1
@@ -714,7 +714,7 @@ EndCompositeWin (XParms xp, Parms p)
 }
 
 static void 
-CompositeArea(XParms xp, Parms p, int reps, Picture src, Picture dst)
+CompositeArea(XParms xp, Parms p, int64_t reps, Picture src, Picture dst)
 {
     int i, size;
     XSegment *sa, *sb;
@@ -746,13 +746,13 @@ CompositeArea(XParms xp, Parms p, int reps, Picture src, Picture dst)
 }
 
 void
-DoCompositeWinWin (XParms xp, Parms p, int reps)
+DoCompositeWinWin (XParms xp, Parms p, int64_t reps)
 {
     CompositeArea (xp, p, reps, winPict, winPict);
 }
 
 void
-DoCompositePixWin (XParms xp, Parms p, int reps)
+DoCompositePixWin (XParms xp, Parms p, int64_t reps)
 {
     CompositeArea (xp, p, reps, pixPict, winPict);
 }

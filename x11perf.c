@@ -105,6 +105,7 @@ static const char *(visualClassNames)[] = {
 static Bool     labels		= False;
 static int      repeat		= 5;
 static int	seconds		= 5;
+static int      delay           = 0;
 
 static Window   status;     /* Status window and GC */
 static GC       tgc;
@@ -476,6 +477,7 @@ usage(void)
 "    -pack                     pack rectangles right next to each other",
 "    -repeat <n>               do tests <n> times (default = 5)",
 "    -time <s>                 do tests for <s> seconds each (default = 5)",
+"    -pause <s>                pause for <s> seconds between each run",
 /*
 "    -draw                     draw after each test -- pmax only",
 */
@@ -873,6 +875,8 @@ ProcessTest(XParms xp, Test *test, int func, unsigned long pm, char *label)
 	    totalTime += time;
 	    ReportTimes (time, reps * test->parms.objects,
 		    label, False);
+            if (delay)
+                sleep(delay);
 	}
 	if (repeat > 1) {
 	    ReportTimes(totalTime,
@@ -991,6 +995,13 @@ main(int argc, char *argv[])
 		usage ();
 	    seconds = atoi (argv[i]);
 	    if (seconds <= 0)
+	       usage ();
+        } else if (strcmp (argv[i], "-pause") == 0) {
+            ++i;
+	    if (argc <= i)
+		usage ();
+	    delay = atoi (argv[i]);
+	    if (delay < 0)
 	       usage ();
 	} else if (strcmp(argv[i], "-fg") == 0) {
 	    i++;

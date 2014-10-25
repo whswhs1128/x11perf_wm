@@ -468,43 +468,39 @@ AbortTest(void)
 static void 
 usage(void)
 {
-    const char    **cpp;
     int     i = 0;
-    static const char *help_message[] = {
-"where options include:",
-"    -display <host:display>   the X server to contact",
-"    -sync                     do the tests in synchronous mode",
-"    -pack                     pack rectangles right next to each other",
-"    -repeat <n>               do tests <n> times (default = 5)",
-"    -time <s>                 do tests for <s> seconds each (default = 5)",
-"    -pause <s>                pause for <s> seconds between each run",
+    static const char *help_message =
+"where options include:\n"
+"    -display <host:display>   the X server to contact\n"
+"    -sync                     do the tests in synchronous mode\n"
+"    -pack                     pack rectangles right next to each other\n"
+"    -repeat <n>               do tests <n> times (default = 5)\n"
+"    -time <s>                 do tests for <s> seconds each (default = 5)\n"
+"    -pause <s>                pause for <s> seconds between each run\n"
 /*
-"    -draw                     draw after each test -- pmax only",
+"    -draw                     draw after each test -- pmax only\n"
 */
-"    -all                      do all tests",
-"    -range <test1>[,<test2>]  like all, but do <test1> to <test2>",
-"    -labels                   generate test labels for use by fillblnk",
-"    -fg                       the foreground color to use",
-"    -bg                       the background color to use",
-"    -clips <default>          default number of clip windows per test",
-"    -ddbg                     the background color to use for DoubleDash",
-"    -rop <rop0 rop1 ...>      use the given rops to draw (default = GXcopy)",
-"    -pm <pm0 pm1 ...>         use the given planemasks to draw (default = ~0)",
-"    -depth <depth>            use a visual with <depth> planes per pixel",
-"    -vclass <class>           the visual class to use (default = root)",
-"    -reps <n>                 fix the rep count (default = auto scale)",
-"    -subs <s0 s1 ...>         a list of the number of sub-windows to use",
-"    -v1.2                     perform only v1.2 tests using old semantics",
-"    -v1.3                     perform only v1.3 tests using old semantics",
-"    -su                       request save unders on windows",
-"    -bs <backing_store_hint>  WhenMapped or Always (default = NotUseful)",
-NULL};
+"    -all                      do all tests\n"
+"    -range <test1>[,<test2>]  like all, but do <test1> to <test2>\n"
+"    -labels                   generate test labels for use by fillblnk\n"
+"    -fg                       the foreground color to use\n"
+"    -bg                       the background color to use\n"
+"    -clips <default>          default number of clip windows per test\n"
+"    -ddbg                     the background color to use for DoubleDash\n"
+"    -rop <rop0 rop1 ...>      use the given rops to draw (default = GXcopy)\n"
+"    -pm <pm0 pm1 ...>         use the given planemasks to draw (default = ~0)\n"
+"    -depth <depth>            use a visual with <depth> planes per pixel\n"
+"    -vclass <class>           the visual class to use (default = root)\n"
+"    -reps <n>                 fix the rep count (default = auto scale)\n"
+"    -subs <s0 s1 ...>         a list of the number of sub-windows to use\n"
+"    -v1.2                     perform only v1.2 tests using old semantics\n"
+"    -v1.3                     perform only v1.3 tests using old semantics\n"
+"    -su                       request save unders on windows\n"
+"    -bs <backing_store_hint>  WhenMapped or Always (default = NotUseful)\n"
+;
 
     fflush(stdout);
-    fprintf(stderr, "usage: %s [-options ...]\n", program_name);
-    for (cpp = help_message; *cpp; cpp++) {
-	fprintf(stderr, "%s\n", *cpp);
-    }
+    fprintf(stderr, "usage: %s [-options ...]\n%s", program_name, help_message);
     while (test[i].option != NULL) {
 	if (test[i].versions & xparms.version ) {
 	    fprintf(stderr, "    %-24s   %s\n",

@@ -541,8 +541,8 @@ HardwareSync(XParms xp)
      */
     XImage *image;
 
-    image = XGetImage(xp->d, xp->p ? xp->p : xp->w, HSx, HSy, 
-		      1, 1, ~0, ZPixmap);
+//    image = XGetImage(xp->d, xp->p ? xp->p : xp->w, HSx, HSy, 
+//		      1, 1, ~0, ZPixmap);
     if (image) XDestroyImage(image);
 }
 
@@ -585,12 +585,12 @@ CreatePerfWindow(XParms xp, int x, int y, int width, int height)
     xswa.background_pixel = xp->background;
     xswa.border_pixel = xp->foreground;
     xswa.colormap = cmap;
-    xswa.override_redirect = True;
+//    xswa.override_redirect = True;
     xswa.backing_store = xp->backing_store;
     xswa.save_under = xp->save_under;
     w = XCreateWindow(xp->d, DefaultRootWindow(xp->d), x, y, width, height, 1,
         xp->vinfo.depth, CopyFromParent, xp->vinfo.visual,
-	CWBackPixel | CWBorderPixel | CWColormap | CWOverrideRedirect 
+	CWBackPixel | CWBorderPixel | CWColormap
 	| CWBackingStore | CWSaveUnder, &xswa);
     XMapWindow (xp->d, w);
     return w;
@@ -1297,6 +1297,7 @@ main(int argc, char *argv[])
     if (DisplayHeight(xparms.d, screen) < HEIGHT + window_y + 1)
 	window_y = -1;
     xparms.w = CreatePerfWindow(&xparms, window_x, window_y, WIDTH, HEIGHT);
+    XStoreName(xparms.d, xparms.w, "x11perf-win-1");
     HSx = WIDTH-1;
     if (window_x + 1 + WIDTH > DisplayWidth(xparms.d, screen))
 	HSx = DisplayWidth(xparms.d, screen) - (1 + window_x + 1);
@@ -1304,6 +1305,7 @@ main(int argc, char *argv[])
     if (window_y + 1 + HEIGHT > DisplayHeight(xparms.d, screen))
 	HSy = DisplayHeight(xparms.d, screen) - (1 + window_y + 1);
     status = CreatePerfWindow(&xparms, window_x, HEIGHT+5, WIDTH, 20);
+    XStoreName(xparms.d, status, "x11perf-win-2");
     tgcv.foreground = 
 	AllocateColor(xparms.d, "black", BlackPixel(xparms.d, screen));
     tgcv.background = 
@@ -1323,7 +1325,7 @@ main(int argc, char *argv[])
 
     /* Figure out how long to call HardwareSync, so we can adjust for that
        in our total elapsed time */
-    (void) CalibrateTest(&xparms, &syncTest, 1, &syncTime);
+//    (void) CalibrateTest(&xparms, &syncTest, 1, &syncTime);
     printf("Sync time adjustment is %6.4f msecs.\n\n", syncTime/1000);
 
     ForEachTest (i) {

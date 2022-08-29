@@ -45,6 +45,7 @@ static Bool     falsePrecision  = False;
 static Pixmap   tileToQuery     = None;
 static char *displayName;
 int	abortTest;
+static int widthheight = 600;
 
 typedef struct _RopNames { const char	*name; int  rop; } RopNameRec, *RopNamePtr;
 
@@ -928,6 +929,7 @@ main(int argc, char *argv[])
     program_name = argv[0];
     displayName = Get_Display_Name (&argc, argv);
     xparms.version = GetVersion(&argc, argv);
+
     for (i = 1; i != argc; i++) {
 	if (strcmp (argv[i], "-all") == 0) {
 	    ForEachTest (j)
@@ -935,6 +937,8 @@ main(int argc, char *argv[])
 	    foundOne = True;
 	} else if (strcmp (argv[i], "-labels") == 0) {
 	    labels = True;
+	} else if (strcmp (argv[i], "-widthheight") == 0) {
+		widthheight = atoi(argv[i+1]);
 	} else if (strcmp(argv[i], "-range") == 0) {
 	    char *cp1;
 	    char *cp2;
@@ -1296,7 +1300,8 @@ main(int argc, char *argv[])
     window_y = 2;
     if (DisplayHeight(xparms.d, screen) < HEIGHT + window_y + 1)
 	window_y = -1;
-    xparms.w = CreatePerfWindow(&xparms, window_x, window_y, WIDTH, HEIGHT);
+    //xparms.w = CreatePerfWindow(&xparms, window_x, window_y, WIDTH, HEIGHT);
+    xparms.w = CreatePerfWindow(&xparms, window_x, window_y, widthheight, widthheight);
     XStoreName(xparms.d, xparms.w, "x11perf-win-1");
     HSx = WIDTH-1;
     if (window_x + 1 + WIDTH > DisplayWidth(xparms.d, screen))
@@ -1304,7 +1309,8 @@ main(int argc, char *argv[])
     HSy = HEIGHT-1;
     if (window_y + 1 + HEIGHT > DisplayHeight(xparms.d, screen))
 	HSy = DisplayHeight(xparms.d, screen) - (1 + window_y + 1);
-    status = CreatePerfWindow(&xparms, window_x, HEIGHT+5, WIDTH, 20);
+    //status = CreatePerfWindow(&xparms, window_x, HEIGHT+5, WIDTH, 20);
+    status = CreatePerfWindow(&xparms, window_x, HEIGHT+5, widthheight, 20);
     XStoreName(xparms.d, status, "x11perf-win-2");
     tgcv.foreground = 
 	AllocateColor(xparms.d, "black", BlackPixel(xparms.d, screen));
